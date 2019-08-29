@@ -51,11 +51,19 @@ if __name__ == "__main__":
         usage()
         sys.exit(1)
 
-    pattern, action = parse(sys.argv[1])
+    if len(sys.argv) > 2 and sys.argv[1] == "-m":
+        exec(sys.argv[2])
+        command_pos = 3
+    else:
+        command_pos = 1
+
+    pattern, action = parse(sys.argv[command_pos])
     
     for line in sys.stdin:
         line = line.rstrip('\n')
         f = [line] + to_number( line.split(' ') )
+        for n, e in enumerate(f):
+            exec("F" + str(n) + " = e ")
 
         if action == "":
             lst = f
