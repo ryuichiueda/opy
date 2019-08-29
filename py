@@ -37,6 +37,9 @@ def to_number(lst):
 def parse(arg):
     pattern, action = "", ""
 
+    if arg[-1] != "]":
+        return arg, ""
+
     for n in range(len(arg)):
         try:
             ast.parse(arg[-n-1:])
@@ -66,7 +69,7 @@ if __name__ == "__main__":
             exec("F" + str(n) + " = e ")
 
         if action == "":
-            lst = f
+            lst = f[1:]
         else:
             lst = eval(action)
 
