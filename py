@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys, os, ast
 
-VERSION = "0.1.0"
+VERSION = "0.2.0"
 COPYRIGHT = "Ryuichi Ueda"
 LICENSE = "MIT license"
 
