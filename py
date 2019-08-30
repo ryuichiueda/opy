@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys, os, ast
 
-VERSION = "0.4.4"
+VERSION = "0.4.5"
 COPYRIGHT = "Ryuichi Ueda"
 LICENSE = "MIT license"
 
@@ -78,8 +78,14 @@ def parse_proc_type(arg):
 
 def parse_pattern(arg):
     for n in range(len(arg)):
-        if arg[-n-1] == ";":
+        if arg[-n-1] != ";":
+            continue
+
+        try:
+            ast.parse(arg[-n:])
             return Sentence(arg[-n:], "", "list"), arg[:-n-1]
+        except:
+            pass
 
     return Sentence(arg, "", "list"), ""
 
