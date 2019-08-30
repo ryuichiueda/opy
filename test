@@ -52,3 +52,13 @@ com=./py
   [ "$result" = "1 1 2 2" ]
 }
 
+@test "multiple pattern/lists" {
+  result=$( seq 2 | $com 'F1%2==0:[F1, ":even"];F1%2==1:[F1, ":odd"]' | xargs)
+  [ "$result" = "1 :odd 2 :even" ]
+}
+
+@test "multiple pattern/actions" {
+  result=$( seq 2 | $com 'F1%2==0:{ print(F1, ":even") } ;F1%2==1:{ print(F1, ":odd")}' |xargs)
+  [ "$result" = "1 :odd 2 :even" ]
+}
+

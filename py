@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys, os, ast
 
-VERSION = "0.5.0"
+VERSION = "0.5.1"
 COPYRIGHT = "Ryuichi Ueda"
 LICENSE = "MIT license"
 
@@ -44,7 +44,9 @@ def parse_list_type(arg):
         if arg[-n-1] == ":":
             try:
                 ast.parse(arg[-n:])
-                return Sentence(arg[:-n-1], arg[-n:], "list"), ""
+                s, r = parse_pattern(arg[:-n-1])
+                #return Sentence(arg[:-n-1], arg[-n:], "list"), ""
+                return Sentence(s.pattern, arg[-n:], "list"), r
             except:
                 pass
         else:
@@ -75,7 +77,8 @@ def parse_proc_type(arg):
             try:
                 action = arg[-n:].rstrip("} ").lstrip(" {")
                 ast.parse(action)
-                return Sentence(arg[:-n-1], action, "proc"), ""
+                s, r = parse_pattern(arg[:-n-1])
+                return Sentence(s.pattern, action, "proc"), r
             except:
                 pass
         else:
