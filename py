@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys, os, ast
 
-VERSION = "0.4.5"
+VERSION = "0.5.0"
 COPYRIGHT = "Ryuichi Ueda"
 LICENSE = "MIT license"
 
@@ -38,14 +38,21 @@ def to_number(lst):
 
 def parse_list_type(arg):
     for n in range(len(arg)-1):
-        if arg[-n-1] != ":":
+        if arg[-n-1] != ":" and arg[-n-1] != ";":
             continue
-
-        try:
-            ast.parse(arg[-n:])
-            return Sentence(arg[:-n-1], arg[-n:], "list"), ""
-        except:
-            pass
+        
+        if arg[-n-1] == ":":
+            try:
+                ast.parse(arg[-n:])
+                return Sentence(arg[:-n-1], arg[-n:], "list"), ""
+            except:
+                pass
+        else:
+            try:
+                ast.parse(arg[-n:])
+                return Sentence("", arg[-n:], "list"), arg[:-n-1]
+            except:
+                pass
 
     try:
         ast.parse(arg)
@@ -58,17 +65,29 @@ def parse_list_type(arg):
 
 def parse_proc_type(arg):
     for n in range(len(arg)-1):
-        if arg[-n-1] != ":":
+        if arg[-n-1] != ":" and arg[-n-1] != ";":
             continue
-        try:
-            action = arg[-n:].rstrip("} ").lstrip(" {")
-            ast.parse(action)
-            return Sentence(arg[:-n-1], action, "proc"), ""
-        except:
-            pass
+
+        if arg[-n:].lstrip(" ")[0] != "{":
+            continue
+
+        if arg[-n-1] == ":":
+            try:
+                action = arg[-n:].rstrip("} ").lstrip(" {")
+                ast.parse(action)
+                return Sentence(arg[:-n-1], action, "proc"), ""
+            except:
+                pass
+        else:
+            try:
+                action = arg[-n:].rstrip("} ").lstrip(" {")
+                ast.parse(action)
+                return Sentence("", action, "proc"), arg[:-n-1]
+            except:
+                pass
 
     try:
-        ast.parse(arg[1:-1])
+        ast.parse(arg.lstrip("{ ").rstrip("} "))
         return Sentence("", arg, "proc"), ""
     except:
         pass

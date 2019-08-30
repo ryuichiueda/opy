@@ -42,3 +42,13 @@ com=./py
   [ "$result" = "1 2 3 4 5 6 7 8 9 10" ]
 }
 
+@test "multiple lists" {
+  result=$( seq 2 | $com '[F1];[F1]' | xargs )
+  [ "$result" = "1 1 2 2" ]
+}
+
+@test "multiple actions" {
+  result=$( seq 2 | $com '{print(F1)};{print(F1)}' | xargs )
+  [ "$result" = "1 1 2 2" ]
+}
+
