@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys, os, ast
 
-VERSION = "0.3.0"
+VERSION = "0.3.1"
 COPYRIGHT = "Ryuichi Ueda"
 LICENSE = "MIT license"
 
@@ -27,6 +27,9 @@ def to_number(lst):
 
 def parse_list_type(arg):
     for n in range(len(arg)):
+        if arg[-n-1] != "[":
+            continue
+
         try:
             ast.parse(arg[-n-1:])
             return arg[:-n-1], arg[-n-1:], "list"
