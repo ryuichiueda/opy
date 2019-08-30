@@ -32,6 +32,8 @@ def to_number(lst):
     return ans
 
 def parse(arg):
+    pattern, action = "", ""
+
     if arg[-1] != "]":
         return arg, ""
 
@@ -41,24 +43,8 @@ def parse(arg):
             return arg[:-n-1], arg[-n-1:]
         except:
             pass
-    
-    print("parse error", file=sys.stderr)
-    sys.exit(1)
 
-def split_fields(line):
-    line = line.rstrip('\n')
-    return [line] + to_number( line.split(' ') )
-
-def exec_line(pattern, action):
-    for line in sys.stdin:
-        f = split_fields(line)
-        for n, e in enumerate(f):
-            exec("F" + str(n) + " = e ")
-
-        lst = eval(action) if action else f[1:]
-
-        if pattern == "" or eval(pattern):
-            print( " ".join([ str(e) for e in lst]) )
+    return pattern, action
 
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "--help":
@@ -72,4 +58,18 @@ if __name__ == "__main__":
         command_pos = 1
 
     pattern, action = parse(sys.argv[command_pos])
-    exec_line(pattern, action)
+    
+    for line in sys.stdin:
+        line = line.rstrip('\n')
+        f = [line] + to_number( line.split(' ') )
+        for n, e in enumerate(f):
+            exec("F" + str(n) + " = e ")
+
+        if action == "":
+            lst = f[1:]
+        else:
+            lst = eval(action)
+
+        if pattern == "" or eval(pattern):
+            print( " ".join([ str(e) for e in lst]) )
+

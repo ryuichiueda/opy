@@ -7,12 +7,12 @@ com=./py
   [ "$result" == '2 4 6 8 10' ]
 }
 
-@test "action" {
+@test "list action" {
   result=$(echo 1 2 3 a b c | $com '[ F2, F3*3, F5+"aaa"]')
   [ "$result" = "2 9 baaa" ]
 }
 
-@test "pattern and action" {
+@test "pattern and list action" {
   result=$(seq 4 | $com 'F1%2==0[F1, ":even"]' | xargs)
   [ "$result" = "2 :even 4 :even" ]
 }
