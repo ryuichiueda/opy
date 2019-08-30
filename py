@@ -18,9 +18,10 @@ class Sentence:
         self.action = action
         self.type = action_type
 
-def exec_lines(s):
+def exec_lines(sentences):
     for line in sys.stdin:
-        exec_line(s.pattern, s.action, s.type, line)
+        for s in sentences:
+            exec_line(s.pattern, s.action, s.type, line)
 
 def to_number(lst):
     ans = []
@@ -42,13 +43,13 @@ def parse_list_type(arg):
 
         try:
             ast.parse(arg[-n:])
-            return Sentence(arg[:-n-1], arg[-n:], "list")
+            return Sentence(arg[:-n-1], arg[-n:], "list"), ""
         except:
             pass
 
     try:
         ast.parse(arg)
-        return Sentence("", arg, "list")
+        return Sentence("", arg, "list"), ""
     except:
         pass
     
@@ -62,13 +63,13 @@ def parse_proc_type(arg):
         try:
             action = arg[-n:].rstrip("} ").lstrip(" {")
             ast.parse(action)
-            return Sentence(arg[:-n-1], action, "proc")
+            return Sentence(arg[:-n-1], action, "proc"), ""
         except:
             pass
 
     try:
         ast.parse(arg[1:-1])
-        return Sentence("", arg, "proc")
+        return Sentence("", arg, "proc"), ""
     except:
         pass
 
@@ -76,12 +77,16 @@ def parse_proc_type(arg):
     sys.exit(1)
 
 def parse(arg):
+    arg = arg.rstrip()
+
     if arg[-1] == "]":
-        return parse_list_type(arg)
+        sentence, remain = parse_list_type(arg)
     elif arg[-1] == "}":
-        return parse_proc_type(arg)
+        sentence, remain = parse_proc_type(arg)
     else:
-        return Sentence(arg, "", "list")
+        sentence, remain = Sentence(arg, "", "list"), ""
+
+    return [sentence]
 
 def split_fields(line):
     line = line.rstrip('\n')
@@ -110,5 +115,5 @@ if __name__ == "__main__":
     else:
         command_pos = 1
 
-    s = parse(sys.argv[command_pos])
-    exec_lines(s)
+    sentences = parse(sys.argv[command_pos])
+    exec_lines(sentences)
