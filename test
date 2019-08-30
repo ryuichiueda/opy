@@ -16,3 +16,8 @@ com=./py
   result=$(seq 4 | $com 'F1%2==0[F1, ":even"]' | xargs)
   [ "$result" = "2 :even 4 :even" ]
 }
+
+@test "module import" {
+  result=$( echo 3.141592 | ./py -m "import math" '[round(math.sin(F1/4),3)]' )
+  [ "$result" = "0.707" ]
+}
