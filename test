@@ -13,7 +13,7 @@ com=./py
 }
 
 @test "pattern and list mode" {
-  result=$(seq 4 | $com 'F1%2==0[F1, ":even"]' | xargs)
+  result=$(seq 4 | $com 'F1%2==0:[F1, ":even"]' | xargs)
   [ "$result" = "2 :even 4 :even" ]
 }
 
@@ -28,7 +28,7 @@ com=./py
 }
 
 @test "pattern and action" {
-  result=$( seq 10 | $com 'F1%2==0{F1= str(F1)+" " ; print(F1,end="")}' )
+  result=$( seq 10 | $com 'F1%2==0:{F1= str(F1)+" " ; print(F1,end="")}' )
   [ "$result" = "2 4 6 8 10 " ]
 }
 

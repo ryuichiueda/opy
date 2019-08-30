@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys, os, ast
 
-VERSION = "0.3.1"
+VERSION = "0.4.0"
 COPYRIGHT = "Ryuichi Ueda"
 LICENSE = "MIT license"
 
@@ -27,28 +27,40 @@ def to_number(lst):
 
 def parse_list_type(arg):
     for n in range(len(arg)):
-        if arg[-n-1] != "[":
+        if arg[-n-2:-n] != ":[":
             continue
 
         try:
             ast.parse(arg[-n-1:])
-            return arg[:-n-1], arg[-n-1:], "list"
+            return arg[:-n-2], arg[-n-1:], "list"
         except:
             pass
+
+    try:
+        ast.parse(arg)
+        return "", arg, "list"
+    except:
+        pass
     
     print("parse error", file=sys.stderr)
     sys.exit(1)
 
 def parse_proc_type(arg):
     for n in range(len(arg[:-1])):
-        if arg[-n] != "{":
+        if arg[-n-2:-n] != ":{":
             continue
         try:
-            ast.parse(arg[-n+1:-1])
-            return arg[:-n], arg[-n+1:-1], "proc"
+            ast.parse(arg[-n:-1])
+            return arg[:-n-2], arg[-n:-1], "proc"
         except:
             pass
-    
+
+    try:
+        ast.parse(arg[1:-1])
+        return "", arg, "proc"
+    except:
+        pass
+
     print("parse error", file=sys.stderr)
     sys.exit(1)
 

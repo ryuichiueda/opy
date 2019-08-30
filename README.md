@@ -27,7 +27,7 @@ $ echo 1 2 3 a b c | py '[ F2, F3*3, F5+"aaa"]'
 * pattern and list mode
 
 ```
-$ seq 10 | py 'F1%2==0[F1, ":even"]'
+$ seq 10 | py 'F1%2==0:[F1, ":even"]'
 2 :even
 4 :even
 6 :even
@@ -45,7 +45,7 @@ $ seq 10 | ./py '{print(F1,end="")}'
 * pattern and action
 
 ```
-$ seq 10 | ./py 'F1%2==0{F1= str(F1)+" " ; print(F1,end="")}' 
+$ seq 10 | ./py 'F1%2==0:{F1= str(F1)+" " ; print(F1,end="")}' 
 2 4 6 8 10 
 ```
 
