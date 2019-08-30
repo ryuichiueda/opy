@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys, os, ast
 
-VERSION = "0.4.1"
+VERSION = "0.4.3"
 COPYRIGHT = "Ryuichi Ueda"
 LICENSE = "MIT license"
 
@@ -11,6 +11,16 @@ def usage():
     print("py " + VERSION, file=sys.stderr)
     print("Copyright 2019 " + COPYRIGHT, file=sys.stderr)
     print("Released under " + LICENSE, file=sys.stderr)
+
+class Sentence:
+    def __init__(self, pattern, action, action_type):
+        self.pattern = pattern
+        self.action = action
+        self.type = action_type
+
+def exec_lines(s):
+    for line in sys.stdin:
+        exec_line(s.pattern, s.action, s.type, line)
 
 def to_number(lst):
     ans = []
@@ -32,13 +42,13 @@ def parse_list_type(arg):
 
         try:
             ast.parse(arg[-n:])
-            return arg[:-n-1], arg[-n:], "list"
+            return Sentence(arg[:-n-1], arg[-n:], "list")
         except:
             pass
 
     try:
         ast.parse(arg)
-        return "", arg, "list"
+        return Sentence("", arg, "list")
     except:
         pass
     
@@ -52,13 +62,13 @@ def parse_proc_type(arg):
         try:
             action = arg[-n:].rstrip("} ").lstrip(" {")
             ast.parse(action)
-            return arg[:-n-1], action, "proc"
+            return Sentence(arg[:-n-1], action, "proc")
         except:
             pass
 
     try:
         ast.parse(arg[1:-1])
-        return "", arg, "proc"
+        return Sentence("", arg, "proc")
     except:
         pass
 
@@ -71,7 +81,7 @@ def parse(arg):
     elif arg[-1] == "}":
         return parse_proc_type(arg)
     else:
-        return arg, "", "list"
+        return Sentence(arg, "", "list")
 
 def split_fields(line):
     line = line.rstrip('\n')
@@ -89,10 +99,6 @@ def exec_line(pattern, action, action_type, line):
         else:
             exec(action)
 
-def exec_lines(pattern, action, action_type):
-    for line in sys.stdin:
-        exec_line(pattern, action, action_type, line)
-
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "--help":
         usage()
@@ -104,5 +110,5 @@ if __name__ == "__main__":
     else:
         command_pos = 1
 
-    pattern, action, action_type = parse(sys.argv[command_pos])
-    exec_lines(pattern, action, action_type)
+    s = parse(sys.argv[command_pos])
+    exec_lines(s)
