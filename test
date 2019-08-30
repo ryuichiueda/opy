@@ -32,3 +32,8 @@ com=./py
   [ "$result" = "2 4 6 8 10 " ]
 }
 
+@test "spaces after the colon" {
+  result=$( seq 10 | $com 'F1%2==0:    {F1= str(F1)+" " ; print(F1,end="")}' )
+  [ "$result" = "2 4 6 8 10 " ]
+}
+
