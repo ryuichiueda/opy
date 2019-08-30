@@ -4,7 +4,9 @@
 
 ## usage 
 
-### pattern
+### basic grammer
+
+* pattern
 
 ```
 $ seq 10 | py 'F1%2==0'
@@ -15,14 +17,14 @@ $ seq 10 | py 'F1%2==0'
 10
 ```
 
-### action
+* list mode
 
 ```
 $ echo 1 2 3 a b c | py '[ F2, F3*3, F5+"aaa"]'
 2 9 baaa
 ```
 
-### pattern and action
+* pattern and list mode
 
 ```
 $ seq 10 | py 'F1%2==0[F1, ":even"]'
@@ -31,6 +33,20 @@ $ seq 10 | py 'F1%2==0[F1, ":even"]'
 6 :even
 8 :even
 10 :even
+```
+
+* action
+
+```
+$ seq 10 | ./py '{print(F1,end="")}' 
+12345678910
+```
+
+* pattern and action
+
+```
+$ seq 10 | ./py 'F1%2==0{F1= str(F1)+" " ; print(F1,end="")}' 
+2 4 6 8 10 
 ```
 
 ### import of modules

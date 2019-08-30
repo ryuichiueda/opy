@@ -7,17 +7,28 @@ com=./py
   [ "$result" == '2 4 6 8 10' ]
 }
 
-@test "list action" {
+@test "list mode" {
   result=$(echo 1 2 3 a b c | $com '[ F2, F3*3, F5+"aaa"]')
   [ "$result" = "2 9 baaa" ]
 }
 
-@test "pattern and list action" {
+@test "pattern and list mode" {
   result=$(seq 4 | $com 'F1%2==0[F1, ":even"]' | xargs)
   [ "$result" = "2 :even 4 :even" ]
 }
 
 @test "module import" {
-  result=$( echo 3.141592 | ./py -m "import math" '[round(math.sin(F1/4),3)]' )
+  result=$( echo 3.141592 | $com -m "import math" '[round(math.sin(F1/4),3)]' )
   [ "$result" = "0.707" ]
 }
+
+@test "action" {
+  result=$( seq 10 | $com '{print(F1,end="")}' )
+  [ "$result" = "12345678910" ]
+}
+
+@test "pattern and action" {
+  result=$( seq 10 | $com 'F1%2==0{F1= str(F1)+" " ; print(F1,end="")}' )
+  [ "$result" = "2 4 6 8 10 " ]
+}
+
