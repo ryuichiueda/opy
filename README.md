@@ -49,6 +49,17 @@ $ seq 10 | ./py 'F1%2==0:{F1= str(F1)+" " ; print(F1,end="")}'
 2 4 6 8 10 
 ```
 
+* muitliple sentences:
+
+```
+$ seq 4 | ./py 'F1%2==0:[F1, ":even"];F1%2==1:[F1, ":odd"]'
+1 :odd
+2 :even
+3 :odd
+4 :even
+```
+
+
 * list comprehension
 
 ```
