@@ -1,5 +1,7 @@
 # py: Python wrapper that works like AWK or rb command
 
+[![Build Status](https://travis-ci.org/ryuichiueda/py.svg?branch=master)](https://travis-ci.org/ryuichiueda/py)
+
 ## usage 
 
 ### pattern

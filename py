@@ -75,3 +75,4 @@ if __name__ == "__main__":
 
         if pattern == "" or eval(pattern):
             print( " ".join([ str(e) for e in lst]) )
+
