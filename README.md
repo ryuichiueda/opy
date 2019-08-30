@@ -38,21 +38,21 @@ $ seq 10 | py 'F1%2==0:[F1, ":even"]'
 * action
 
 ```
-$ seq 10 | ./py '{print(F1,end="")}' 
+$ seq 10 | py '{print(F1,end="")}' 
 12345678910
 ```
 
 * pattern and action
 
 ```
-$ seq 10 | ./py 'F1%2==0:{F1= str(F1)+" " ; print(F1,end="")}' 
+$ seq 10 | py 'F1%2==0:{F1= str(F1)+" " ; print(F1,end="")}' 
 2 4 6 8 10 
 ```
 
 * muitliple sentences:
 
 ```
-$ seq 4 | ./py 'F1%2==0:[F1, ":even"];F1%2==1:[F1, ":odd"]'
+$ seq 4 | py 'F1%2==0:[F1, ":even"];F1%2==1:[F1, ":odd"]'
 1 :odd
 2 :even
 3 :odd
@@ -63,7 +63,7 @@ $ seq 4 | ./py 'F1%2==0:[F1, ":even"];F1%2==1:[F1, ":odd"]'
 * list comprehension
 
 ```
-$ seq 1 100 | xargs -n 10 | ./py '[ 1.0/x for x in f[1:3] ]'
+$ seq 1 100 | xargs -n 10 | py '[ 1.0/x for x in f[1:3] ]'
 1.0 0.5
 0.09090909090909091 0.08333333333333333
 0.047619047619047616 0.045454545454545456
