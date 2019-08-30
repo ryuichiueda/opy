@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys, os, ast
 
-VERSION = "0.4.3"
+VERSION = "0.4.4"
 COPYRIGHT = "Ryuichi Ueda"
 LICENSE = "MIT license"
 
@@ -76,7 +76,14 @@ def parse_proc_type(arg):
     print("parse error", file=sys.stderr)
     sys.exit(1)
 
-def parse(arg):
+def parse_pattern(arg):
+    for n in range(len(arg)):
+        if arg[-n-1] == ";":
+            return Sentence(arg[-n:], "", "list"), arg[:-n-1]
+
+    return Sentence(arg, "", "list"), ""
+
+def parse(sentences, arg):
     arg = arg.rstrip()
 
     if arg[-1] == "]":
@@ -84,9 +91,12 @@ def parse(arg):
     elif arg[-1] == "}":
         sentence, remain = parse_proc_type(arg)
     else:
-        sentence, remain = Sentence(arg, "", "list"), ""
+        sentence, remain = parse_pattern(arg)
 
-    return [sentence]
+    if remain == "":
+        return [sentence] + sentences
+
+    return parse([sentence] + sentences, remain)
 
 def split_fields(line):
     line = line.rstrip('\n')
@@ -115,5 +125,5 @@ if __name__ == "__main__":
     else:
         command_pos = 1
 
-    sentences = parse(sys.argv[command_pos])
+    sentences = parse([], sys.argv[command_pos])
     exec_lines(sentences)

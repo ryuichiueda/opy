@@ -37,3 +37,8 @@ com=./py
   [ "$result" = "2 4 6 8 10 " ]
 }
 
+@test "multiple pattern" {
+  result=$( seq 10 | $com 'F1%2==0;F1%2==1' | xargs )
+  [ "$result" = "1 2 3 4 5 6 7 8 9 10" ]
+}
+
