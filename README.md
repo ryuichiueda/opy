@@ -85,4 +85,19 @@ $ seq 1 3 | py -m 'import math' '[ F1*math.pi, math.sin(F1) ]'
 9.42477796076938 0.1411200080598672
 ````
 
+### BEGIN and END patterns
+
+```
+$ seq 10 | py 'B:{a=0};{a+=F1};E:{print(a)}'
+55
+```
+
+or 
+
+```
+$ seq 10 | py 'BEGIN:{a=0};{a+=F1};END:{print(a)}'
+55
+```
+
+
 

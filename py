@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys, os, ast
 
-VERSION = "0.6.0"
+VERSION = "0.6.1"
 COPYRIGHT = "Ryuichi Ueda"
 LICENSE = "MIT license"
 
@@ -139,14 +139,19 @@ if __name__ == "__main__":
     sentences = parse([], sys.argv[command_pos])
 
     begins = [ s for s in sentences if s.pattern in ["B", "BEGIN" ] ]
-    lines = [ s for s in sentences if s.pattern not in ["B", "BEGIN", "E", "END" ] ]
+    normals = [ s for s in sentences if s.pattern not in ["B", "BEGIN", "E", "END" ] ]
     ends = [ s for s in sentences if s.pattern in ["E", "END" ] ]
 
     for s in begins:
         exec(s.action)
 
+    if len(normals) == 0:
+        for s in ends:
+            exec(s.action)
+        sys.exit(0)
+
     for line in sys.stdin:
-        for s in lines:
+        for s in normals:
             f = split_fields(line)
             for n, e in enumerate(f):
                 exec("F" + str(n) + " = e ")

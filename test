@@ -67,9 +67,13 @@ com=./py
   [ "$result" = "1 hoge" ]
 }
 
-
 @test "end pattern" {
-  result=$( seq 2 | $com 'B:{a=0};{a+=F1};END:{print(a)}' |xargs)
+  result=$( seq 2 | $com 'B:{a=0};{a+=F1};END:{print(a)}' )
   [ "$result" = "3" ]
+}
+
+@test "close stdin" {
+  result=$( $com 'B:{print(1+1)}' )
+  [ "$result" = "2" ]
 }
 
