@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys, os, ast
 
-__version__ = "0.7.1"
+__version__ = "0.7.2"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/py"
@@ -84,8 +84,9 @@ def parse_proc_type(arg):
                 pass
 
     try:
-        ast.parse(arg.lstrip("{ ").rstrip("} "))
-        return Rule("", arg, "proc"), ""
+        action = arg.lstrip("{ ").rstrip("} ")
+        ast.parse(action)
+        return Rule("", action, "proc"), ""
     except:
         pass
 

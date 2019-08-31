@@ -27,6 +27,11 @@ com=./py
   [ "$result" = "12345678910" ]
 }
 
+@test "action2" {
+  result=$( seq 3 | $com '{r=1;print(r)}' | xargs )
+  [ "$result" = "1 1 1" ]
+}
+
 @test "pattern and action" {
   result=$( seq 10 | $com 'F1%2==0:{F1= str(F1)+" " ; print(F1,end="")}' )
   [ "$result" = "2 4 6 8 10 " ]
