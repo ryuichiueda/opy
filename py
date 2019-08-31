@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys, os, ast
 
-VERSION = "0.6.5"
+VERSION = "0.6.6"
 COPYRIGHT = "Ryuichi Ueda"
 LICENSE = "MIT license"
 
@@ -40,7 +40,6 @@ def parse_list_type(arg):
             try:
                 ast.parse(arg[-n:])
                 s, r = parse_pattern(arg[:-n-1])
-                #return Sentence(arg[:-n-1], arg[-n:], "list"), ""
                 return Sentence(s.pattern, arg[-n:], "list"), r
             except:
                 pass
@@ -99,8 +98,9 @@ def parse_pattern(arg):
             continue
 
         try:
-            ast.parse(arg[-n:])
-            return Sentence(arg[-n:], "", "list"), arg[:-n-1]
+            pat = arg[-n:].lstrip().rstrip()
+            ast.parse(pat)
+            return Sentence(pat, "", "list"), arg[:-n-1]
         except:
             pass
 

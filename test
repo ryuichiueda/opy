@@ -88,3 +88,9 @@ com=./py
 }
 
 
+@test "space" {
+  result=$( seq 2 | $com 'B:{a=0}; {a+=F1}; END:[a]' )
+  [ "$result" = "3" ]
+}
+
+
