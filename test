@@ -62,3 +62,14 @@ com=./py
   [ "$result" = "1 :odd 2 :even" ]
 }
 
+@test "begin pattern" {
+  result=$( seq 2 | $com 'B:{a="hoge"};F1%2==1:{ print(F1, a)}' |xargs)
+  [ "$result" = "1 hoge" ]
+}
+
+
+@test "end pattern" {
+  result=$( seq 2 | $com 'B:{a=0};{a+=F1};END:{print(a)}' |xargs)
+  [ "$result" = "3" ]
+}
+

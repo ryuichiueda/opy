@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys, os, ast
 
-VERSION = "0.5.1"
+VERSION = "0.6.0"
 COPYRIGHT = "Ryuichi Ueda"
 LICENSE = "MIT license"
 
@@ -17,11 +17,6 @@ class Sentence:
         self.pattern = pattern
         self.action = action
         self.type = action_type
-
-def exec_lines(sentences):
-    for line in sys.stdin:
-        for s in sentences:
-            exec_line(s.pattern, s.action, s.type, line)
 
 def to_number(lst):
     ans = []
@@ -130,18 +125,6 @@ def split_fields(line):
     line = line.rstrip('\n')
     return [line] + to_number( line.split(' ') )
 
-def exec_line(pattern, action, action_type, line):
-    f = split_fields(line)
-    for n, e in enumerate(f):
-        exec("F" + str(n) + " = e ")
-
-    if pattern == "" or eval(pattern):
-        if action_type == "list":
-            lst = eval(action) if action else f[1:]
-            print( " ".join([ str(e) for e in lst]) )
-        else:
-            exec(action)
-
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "--help":
         usage()
@@ -154,4 +137,26 @@ if __name__ == "__main__":
         command_pos = 1
 
     sentences = parse([], sys.argv[command_pos])
-    exec_lines(sentences)
+
+    begins = [ s for s in sentences if s.pattern in ["B", "BEGIN" ] ]
+    lines = [ s for s in sentences if s.pattern not in ["B", "BEGIN", "E", "END" ] ]
+    ends = [ s for s in sentences if s.pattern in ["E", "END" ] ]
+
+    for s in begins:
+        exec(s.action)
+
+    for line in sys.stdin:
+        for s in lines:
+            f = split_fields(line)
+            for n, e in enumerate(f):
+                exec("F" + str(n) + " = e ")
+        
+            if s.pattern == "" or eval(s.pattern):
+                if s.type == "list":
+                    lst = eval(s.action) if s.action else f[1:]
+                    print( " ".join([ str(e) for e in lst]) )
+                else:
+                    exec(s.action)
+
+    for s in ends:
+        exec(s.action)
