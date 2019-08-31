@@ -87,6 +87,8 @@ $ seq 1 3 | py -m 'import math' '[ F1*math.pi, math.sin(F1) ]'
 
 ### BEGIN and END patterns
 
+* basic use
+
 ```
 $ seq 10 | py 'B:{a=0};{a+=F1};E:{print(a)}'
 55
@@ -97,6 +99,13 @@ or
 ```
 $ seq 10 | py 'BEGIN:{a=0};{a+=F1};END:{print(a)}'
 55
+```
+
+* list at begin
+
+```
+$ py 'B:[1+1]'
+2
 ```
 
 

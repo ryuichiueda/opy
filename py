@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys, os, ast
 
-VERSION = "0.6.1"
+VERSION = "0.6.2"
 COPYRIGHT = "Ryuichi Ueda"
 LICENSE = "MIT license"
 
@@ -143,7 +143,10 @@ if __name__ == "__main__":
     ends = [ s for s in sentences if s.pattern in ["E", "END" ] ]
 
     for s in begins:
-        exec(s.action)
+        if s.type == "list":
+            print( " ".join([ str(e) for e in eval(s.action)]) )
+        else:
+            exec(s.action)
 
     if len(normals) == 0:
         for s in ends:

@@ -77,3 +77,8 @@ com=./py
   [ "$result" = "2" ]
 }
 
+@test "list at begin" {
+  result=$( $com 'B:[1+1]' )
+  [ "$result" = "2" ]
+}
+
