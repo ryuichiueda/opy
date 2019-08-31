@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys, os, ast
 
-__version__ = "0.7.0"
+__version__ = "0.7.1"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/py"
@@ -134,9 +134,11 @@ def main_proc(header, begins, normals, ends):
         for s in ends: exec(s.action)
         sys.exit(0)
 
-    for line in sys.stdin:
+    for n, line in enumerate(sys.stdin):
         f = split_fields(line)
         NF = len(f) - 1
+        NR = n + 1
+
         for n, e in enumerate(f):
             exec("F" + str(n) + " = e ")
         

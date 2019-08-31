@@ -98,4 +98,9 @@ com=./py
   [ "$result" = "3 3 3 1" ]
 }
 
+@test "NR" {
+  result=$( yes | head -n 3 | $com '[NR]' | xargs )
+  [ "$result" = "1 2 3" ]
+}
+
 
