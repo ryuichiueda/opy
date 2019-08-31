@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys, os, ast
 
-VERSION = "0.6.7"
+VERSION = "0.6.9"
 COPYRIGHT = "Ryuichi Ueda"
 LICENSE = "MIT license"
 
@@ -106,29 +106,24 @@ def parse_pattern(arg):
 
     return Rule(arg, "", "list"), ""
 
-def parse(sentences, arg):
+def parse(rules, arg):
     arg = arg.rstrip()
-    if len(arg) == 0:
-        return sentences
+    if arg == "":
+        return rules
 
-    if arg[-1] == "]":
-        sentence, remain = parse_list_type(arg)
-    elif arg[-1] == "}":
-        sentence, remain = parse_proc_type(arg)
-    else:
-        sentence, remain = parse_pattern(arg)
+    if arg[-1] == "]":   rule, remain = parse_list_type(arg)
+    elif arg[-1] == "}": rule, remain = parse_proc_type(arg)
+    else:                rule, remain = parse_pattern(arg)
 
-    if remain == "":
-        return [sentence] + sentences
-
-    return parse([sentence] + sentences, remain)
+    if remain == "": return [rule] + rules
+    else:            return parse([rule] + rules, remain)
 
 def split_fields(line):
     line = line.rstrip('\n')
     return [line] + to_number( line.split(' ') )
 
-def main_proc(begins, normals, ends):
-
+def main_proc(header, begins, normals, ends):
+    exec(header)
     for s in begins:
         if s.type == "list":
             print( " ".join([ str(e) for e in eval(s.action)]) )
@@ -136,8 +131,7 @@ def main_proc(begins, normals, ends):
             exec(s.action)
 
     if len(normals) == 0:
-        for s in ends:
-            exec(s.action)
+        for s in ends: exec(s.action)
         sys.exit(0)
 
     for line in sys.stdin:
@@ -159,21 +153,22 @@ def main_proc(begins, normals, ends):
         else:
             exec(s.action)
 
+def begin_end_separation(rules):
+    begins = [ s for s in rules if s.pattern in ["B", "BEGIN" ] ]
+    regulars = [ s for s in rules if s.pattern not in ["B", "BEGIN", "E", "END" ] ]
+    ends = [ s for s in rules if s.pattern in ["E", "END" ] ]
+    return begins, regulars, ends
+
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "--help":
         usage()
         sys.exit(1)
 
     if len(sys.argv) > 2 and sys.argv[1] == "-m":
-        exec(sys.argv[2])
-        code = sys.argv[3]
+        header, code = sys.argv[2:4]
     else:
-        code = sys.argv[1]
+        header, code = "", sys.argv[1]
 
     rules = parse([], code)
-
-    begins = [ s for s in rules if s.pattern in ["B", "BEGIN" ] ]
-    normals = [ s for s in rules if s.pattern not in ["B", "BEGIN", "E", "END" ] ]
-    ends = [ s for s in rules if s.pattern in ["E", "END" ] ]
-
-    main_proc(begins, normals, ends)
+    begins, regulars, ends = begin_end_separation(rules)
+    main_proc(header, begins, regulars, ends)
