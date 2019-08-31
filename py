@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys, os, ast
 
-VERSION = "0.6.2"
+VERSION = "0.6.3"
 COPYRIGHT = "Ryuichi Ueda"
 LICENSE = "MIT license"
 
@@ -108,6 +108,8 @@ def parse_pattern(arg):
 
 def parse(sentences, arg):
     arg = arg.rstrip()
+    if len(arg) == 0:
+        return sentences
 
     if arg[-1] == "]":
         sentence, remain = parse_list_type(arg)
