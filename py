@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys, os, ast
 
-VERSION = "0.6.3"
+VERSION = "0.6.4"
 COPYRIGHT = "Ryuichi Ueda"
 LICENSE = "MIT license"
 
@@ -169,4 +169,7 @@ if __name__ == "__main__":
                     exec(s.action)
 
     for s in ends:
-        exec(s.action)
+        if s.type == "list":
+            print( " ".join([ str(e) for e in eval(s.action)]) )
+        else:
+            exec(s.action)

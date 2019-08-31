@@ -82,3 +82,9 @@ com=./py
   [ "$result" = "2" ]
 }
 
+@test "list at end" {
+  result=$( seq 2 | $com 'B:{a=0};{a+=F1};END:[a]' )
+  [ "$result" = "3" ]
+}
+
+
