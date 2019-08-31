@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys, os, ast
 
-VERSION = "0.6.6"
+VERSION = "0.6.7"
 COPYRIGHT = "Ryuichi Ueda"
 LICENSE = "MIT license"
 
@@ -12,7 +12,7 @@ def usage():
     print("Copyright 2019 " + COPYRIGHT, file=sys.stderr)
     print("Released under " + LICENSE, file=sys.stderr)
 
-class Sentence:
+class Rule:
     def __init__(self, pattern, action, action_type):
         self.pattern = pattern
         self.action = action
@@ -40,19 +40,19 @@ def parse_list_type(arg):
             try:
                 ast.parse(arg[-n:])
                 s, r = parse_pattern(arg[:-n-1])
-                return Sentence(s.pattern, arg[-n:], "list"), r
+                return Rule(s.pattern, arg[-n:], "list"), r
             except:
                 pass
         else:
             try:
                 ast.parse(arg[-n:])
-                return Sentence("", arg[-n:], "list"), arg[:-n-1]
+                return Rule("", arg[-n:], "list"), arg[:-n-1]
             except:
                 pass
 
     try:
         ast.parse(arg)
-        return Sentence("", arg, "list"), ""
+        return Rule("", arg, "list"), ""
     except:
         pass
     
@@ -72,20 +72,20 @@ def parse_proc_type(arg):
                 action = arg[-n:].rstrip("} ").lstrip(" {")
                 ast.parse(action)
                 s, r = parse_pattern(arg[:-n-1])
-                return Sentence(s.pattern, action, "proc"), r
+                return Rule(s.pattern, action, "proc"), r
             except:
                 pass
         else:
             try:
                 action = arg[-n:].rstrip("} ").lstrip(" {")
                 ast.parse(action)
-                return Sentence("", action, "proc"), arg[:-n-1]
+                return Rule("", action, "proc"), arg[:-n-1]
             except:
                 pass
 
     try:
         ast.parse(arg.lstrip("{ ").rstrip("} "))
-        return Sentence("", arg, "proc"), ""
+        return Rule("", arg, "proc"), ""
     except:
         pass
 
@@ -100,11 +100,11 @@ def parse_pattern(arg):
         try:
             pat = arg[-n:].lstrip().rstrip()
             ast.parse(pat)
-            return Sentence(pat, "", "list"), arg[:-n-1]
+            return Rule(pat, "", "list"), arg[:-n-1]
         except:
             pass
 
-    return Sentence(arg, "", "list"), ""
+    return Rule(arg, "", "list"), ""
 
 def parse(sentences, arg):
     arg = arg.rstrip()
@@ -127,22 +127,7 @@ def split_fields(line):
     line = line.rstrip('\n')
     return [line] + to_number( line.split(' ') )
 
-if __name__ == "__main__":
-    if len(sys.argv) > 1 and sys.argv[1] == "--help":
-        usage()
-        sys.exit(1)
-
-    if len(sys.argv) > 2 and sys.argv[1] == "-m":
-        exec(sys.argv[2])
-        command_pos = 3
-    else:
-        command_pos = 1
-
-    sentences = parse([], sys.argv[command_pos])
-
-    begins = [ s for s in sentences if s.pattern in ["B", "BEGIN" ] ]
-    normals = [ s for s in sentences if s.pattern not in ["B", "BEGIN", "E", "END" ] ]
-    ends = [ s for s in sentences if s.pattern in ["E", "END" ] ]
+def main_proc(begins, normals, ends):
 
     for s in begins:
         if s.type == "list":
@@ -173,3 +158,22 @@ if __name__ == "__main__":
             print( " ".join([ str(e) for e in eval(s.action)]) )
         else:
             exec(s.action)
+
+if __name__ == "__main__":
+    if len(sys.argv) > 1 and sys.argv[1] == "--help":
+        usage()
+        sys.exit(1)
+
+    if len(sys.argv) > 2 and sys.argv[1] == "-m":
+        exec(sys.argv[2])
+        code = sys.argv[3]
+    else:
+        code = sys.argv[1]
+
+    rules = parse([], code)
+
+    begins = [ s for s in rules if s.pattern in ["B", "BEGIN" ] ]
+    normals = [ s for s in rules if s.pattern not in ["B", "BEGIN", "E", "END" ] ]
+    ends = [ s for s in rules if s.pattern in ["E", "END" ] ]
+
+    main_proc(begins, normals, ends)
