@@ -136,7 +136,7 @@ def main_proc(header, begins, normals, ends):
 
     for line in sys.stdin:
         f = split_fields(line)
-        NF = len(f) - 1
+        NF = len(f)-1
         for n, e in enumerate(f):
             exec("F" + str(n) + " = e ")
         

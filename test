@@ -93,4 +93,9 @@ com=./py
   [ "$result" = "3" ]
 }
 
+@test "NF" {
+  result=$( seq 10 | xargs -n 3 | $com '[NF]' | xargs )
+  [ "$result" = "3 3 3 1" ]
+}
+
 
