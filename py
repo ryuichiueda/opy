@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys, os, ast
 
-VERSION = "0.6.4"
+VERSION = "0.6.5"
 COPYRIGHT = "Ryuichi Ueda"
 LICENSE = "MIT license"
 
@@ -156,11 +156,11 @@ if __name__ == "__main__":
         sys.exit(0)
 
     for line in sys.stdin:
-        for s in normals:
-            f = split_fields(line)
-            for n, e in enumerate(f):
-                exec("F" + str(n) + " = e ")
+        f = split_fields(line)
+        for n, e in enumerate(f):
+            exec("F" + str(n) + " = e ")
         
+        for s in normals:
             if s.pattern == "" or eval(s.pattern):
                 if s.type == "list":
                     lst = eval(s.action) if s.action else f[1:]
