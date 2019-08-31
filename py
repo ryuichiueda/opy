@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 import sys, os, ast
 
-VERSION = "0.6.9"
-COPYRIGHT = "Ryuichi Ueda"
-LICENSE = "MIT license"
-
-f = []
+__version__ = "0.6.10"
+__author__ = "Ryuichi Ueda"
+__license__ = "MIT license"
+__url__ = "https://github.com/ryuichiueda/py"
 
 def usage():
-    print("py " + VERSION, file=sys.stderr)
-    print("Copyright 2019 " + COPYRIGHT, file=sys.stderr)
-    print("Released under " + LICENSE, file=sys.stderr)
+    print("py " + __version__, file=sys.stderr)
+    print("Copyright 2019 " + __author__, file=sys.stderr)
+    print("\nReleased under " + __license__, file=sys.stderr)
+    print(__url__, file=sys.stderr)
 
 class Rule:
     def __init__(self, pattern, action, action_type):
