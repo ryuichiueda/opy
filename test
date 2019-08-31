@@ -67,6 +67,11 @@ com=./py
   [ "$result" = "1 :odd 2 :even" ]
 }
 
+@test "multiple actions/list actions" {
+  result=$(echo a | $com 'B:[2]; B:{ print(1) }; {print(3)}; [4]' | xargs)
+  [ "$result" = "2 1 3 4" ]
+}
+
 @test "begin pattern" {
   result=$( seq 2 | $com 'B:{a="hoge"};F1%2==1:{ print(F1, a)}' |xargs)
   [ "$result" = "1 hoge" ]

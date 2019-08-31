@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys, os, ast
 
-__version__ = "0.7.3"
+__version__ = "0.7.2"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/py"
@@ -45,9 +45,8 @@ def parse_list_type(arg):
                 pass
         else:
             try:
-                action = arg[-n:].lstrip()
-                ast.parse(action)
-                return Rule("", action, "list"), arg[:-n-1]
+                ast.parse(arg[-n:].rstlip().lstrip())
+                return Rule("", arg[-n:], "list"), arg[:-n-1]
             except:
                 pass
 
