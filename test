@@ -113,4 +113,10 @@ com=./py
   [ "$result" = "1 2 3" ]
 }
 
+@test "dynamic module load" {
+  result=$(echo 10 | $com '[round(math.sin(F1),3)]' )
+  [ "$result" = "-0.544" ]
+}
+
+
 

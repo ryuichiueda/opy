@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-import sys, os, ast
+import sys, os, ast, re
 
-__version__ = "0.7.6"
+__version__ = "0.8.0"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/py"
@@ -125,8 +125,14 @@ def split_fields(line):
     return [line] + to_number( line.split(' ') )
 
 def print_list(rule, f, glo, loc):
-    lst = eval(rule.action, glo, loc) if rule.action else f[1:]
-    print( " ".join([ str(e) for e in lst]) )
+    try:
+        lst = eval(rule.action, glo, loc) if rule.action else f[1:]
+        print( " ".join([ str(e) for e in lst]) )
+    except NameError as e:
+        module = re.search(r'\'[^\']+\'', str(e)).group().strip("'")
+        exec("import " + module, globals())
+        print_list(rule, f, glo, loc)
+
 
 def main_proc(header, begins, normals, ends):
     f = []
