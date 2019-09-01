@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys, os, ast, re
 
-__version__ = "0.8.3"
+__version__ = "0.9.0"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/py"
@@ -11,6 +11,14 @@ def usage():
     print("Copyright 2019 " + __author__, file=sys.stderr)
     print("\nReleased under " + __license__, file=sys.stderr)
     print(__url__, file=sys.stderr)
+
+f = []
+
+def r_(rgx, s=None):
+    if s is None:
+        s = f[0]
+
+    return re.search(rgx, str(s))
 
 class Rule:
     def __init__(self, pattern, action, do_exec=False):
@@ -130,8 +138,8 @@ def print_list(rule, f, glo, loc):
         print_list(rule, f, glo, loc)
 
 
-def main_proc(header, begins, normals, ends):
-    f = []
+def main_proc(header, begins, normals, ends, files):
+    global f
     NF = 0
     NR = 0
 
@@ -152,7 +160,7 @@ def main_proc(header, begins, normals, ends):
 
         for n, e in enumerate(f):
             exec("F" + str(n) + " = e ")
-        
+ 
         for r in normals:
             if r.pattern != "" and not eval(r.pattern):
                 continue
@@ -175,11 +183,16 @@ if __name__ == "__main__":
         usage()
         sys.exit(1)
 
+    files = []
     if len(sys.argv) > 2 and sys.argv[1] == "-m":
         header, code = sys.argv[2:4]
+        if len(sys.argv) > 4:
+            files = sys.argv[4:]
     else:
         header, code = "", sys.argv[1]
+        if len(sys.argv) > 2:
+            files = sys.argv[2:]
 
     rules = parse([], code)
     begins, normals, ends = begin_end_separation(rules)
-    main_proc(header, begins, normals, ends)
+    main_proc(header, begins, normals, ends, files)

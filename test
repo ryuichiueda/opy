@@ -118,5 +118,13 @@ com=./py
   [ "$result" = "-0.544" ]
 }
 
+@test "regex" {
+  result=$( seq 10 | ./py 'r_("[24680]$")' | xargs )
+  [ "$result" = "2 4 6 8 10" ]
+}
 
+@test "field regex" {
+  result=$( seq 10 | xargs -n 2 | ./py 'r_("[48]$",F2)' | xargs )
+  [ "$result" = "3 4 7 8" ]
+}
 
