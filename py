@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys, os, ast
 
-__version__ = "0.7.5"
+__version__ = "0.7.6"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/py"
@@ -33,7 +33,7 @@ def to_number(lst):
 
 def parse_list_type(arg):
     for n in range(len(arg)-1):
-        if arg[-n-1] != ":" and arg[-n-1] != ";":
+        if arg[-n-1] not in ":;":
             continue
         
         if arg[-n-1] == ":":
@@ -62,7 +62,7 @@ def parse_list_type(arg):
 
 def parse_proc_type(arg):
     for n in range(len(arg)-1):
-        if arg[-n-1] != ":" and arg[-n-1] != ";":
+        if arg[-n-1] not in ":;":
             continue
 
         if arg[-n:].lstrip(" ")[0] != "{":
@@ -135,14 +135,12 @@ def main_proc(header, begins, normals, ends):
 
     exec(header)
 
-    for s in begins:
-        if s.do_exec:
-            exec(s.action)
-        else:
-            print_list(s, f, globals(), locals())
+    for r in begins:
+        if r.do_exec: exec(r.action)
+        else:         print_list(r, f, globals(), locals())
 
     if len(normals) == 0:
-        for s in ends: exec(s.action)
+        for r in ends: exec(r.action)
         sys.exit(0)
 
     for line in sys.stdin:
@@ -153,26 +151,22 @@ def main_proc(header, begins, normals, ends):
         for n, e in enumerate(f):
             exec("F" + str(n) + " = e ")
         
-        for s in normals:
-            if s.pattern != "" and not eval(s.pattern):
+        for r in normals:
+            if r.pattern != "" and not eval(r.pattern):
                 continue
 
-            if s.do_exec:
-                exec(s.action)
-            else:
-                print_list(s, f, globals(), locals())
+            if r.do_exec: exec(r.action)
+            else:         print_list(r, f, globals(), locals())
 
-    for s in ends:
-        if s.do_exec:
-            exec(s.action)
-        else:
-            print_list(s, f, globals(), locals())
+    for r in ends:
+        if r.do_exec: exec(r.action)
+        else:         print_list(r, f, globals(), locals())
 
 def begin_end_separation(rules):
     begins = [ r for r in rules if r.pattern in ["B", "BEGIN" ] ]
-    regulars = [ r for r in rules if r.pattern not in ["B", "BEGIN", "E", "END" ] ]
+    normals = [ r for r in rules if r.pattern not in ["B", "BEGIN", "E", "END" ] ]
     ends = [ r for r in rules if r.pattern in ["E", "END" ] ]
-    return begins, regulars, ends
+    return begins, normals, ends
 
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "--help":
@@ -185,5 +179,5 @@ if __name__ == "__main__":
         header, code = "", sys.argv[1]
 
     rules = parse([], code)
-    begins, regulars, ends = begin_end_separation(rules)
-    main_proc(header, begins, regulars, ends)
+    begins, normals, ends = begin_end_separation(rules)
+    main_proc(header, begins, normals, ends)
