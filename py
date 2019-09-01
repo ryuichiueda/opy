@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys, os, ast
 
-__version__ = "0.7.4"
+__version__ = "0.7.5"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/py"
@@ -13,10 +13,10 @@ def usage():
     print(__url__, file=sys.stderr)
 
 class Rule:
-    def __init__(self, pattern, action, action_type):
+    def __init__(self, pattern, action, do_exec=False):
         self.pattern = pattern
         self.action = action
-        self.type = action_type
+        self.do_exec = do_exec
 
 def to_number(lst):
     ans = []
@@ -40,20 +40,20 @@ def parse_list_type(arg):
             try:
                 ast.parse(arg[-n:])
                 s, r = parse_pattern(arg[:-n-1])
-                return Rule(s.pattern, arg[-n:], "list"), r
+                return Rule(s.pattern, arg[-n:]), r
             except:
                 pass
         else:
             try:
                 action = arg[-n:].lstrip()
                 ast.parse(action)
-                return Rule("", action, "list"), arg[:-n-1]
+                return Rule("", action), arg[:-n-1]
             except:
                 pass
 
     try:
         ast.parse(arg)
-        return Rule("", arg, "list"), ""
+        return Rule("", arg), ""
     except:
         pass
     
@@ -73,21 +73,21 @@ def parse_proc_type(arg):
                 action = arg[-n:].rstrip("} ").lstrip(" {")
                 ast.parse(action)
                 s, r = parse_pattern(arg[:-n-1])
-                return Rule(s.pattern, action, "proc"), r
+                return Rule(s.pattern, action, True), r
             except:
                 pass
         else:
             try:
                 action = arg[-n:].rstrip("} ").lstrip(" {")
                 ast.parse(action)
-                return Rule("", action, "proc"), arg[:-n-1]
+                return Rule("", action, True), arg[:-n-1]
             except:
                 pass
 
     try:
         action = arg.lstrip("{ ").rstrip("} ")
         ast.parse(action)
-        return Rule("", action, "proc"), ""
+        return Rule("", action, True), ""
     except:
         pass
 
@@ -102,11 +102,11 @@ def parse_pattern(arg):
         try:
             pat = arg[-n:].lstrip().rstrip()
             ast.parse(pat)
-            return Rule(pat, "", "list"), arg[:-n-1]
+            return Rule(pat, ""), arg[:-n-1]
         except:
             pass
 
-    return Rule(arg, "", "list"), ""
+    return Rule(arg, ""), ""
 
 def parse(rules, arg):
     arg = arg.rstrip()
@@ -129,43 +129,49 @@ def print_list(rule, f, glo, loc):
     print( " ".join([ str(e) for e in lst]) )
 
 def main_proc(header, begins, normals, ends):
-    exec(header)
     f = []
+    NF = 0
+    NR = 0
+
+    exec(header)
+
     for s in begins:
-        if s.type == "list":
-            print_list(s, f, globals(), locals())
-        else:
+        if s.do_exec:
             exec(s.action)
+        else:
+            print_list(s, f, globals(), locals())
 
     if len(normals) == 0:
         for s in ends: exec(s.action)
         sys.exit(0)
 
-    for n, line in enumerate(sys.stdin):
+    for line in sys.stdin:
         f = split_fields(line)
         NF = len(f) - 1
-        NR = n + 1
+        NR += 1
 
         for n, e in enumerate(f):
             exec("F" + str(n) + " = e ")
         
         for s in normals:
-            if s.pattern == "" or eval(s.pattern):
-                if s.type == "list":
-                    print_list(s, f, globals(), locals())
-                else:
-                    exec(s.action)
+            if s.pattern != "" and not eval(s.pattern):
+                continue
+
+            if s.do_exec:
+                exec(s.action)
+            else:
+                print_list(s, f, globals(), locals())
 
     for s in ends:
-        if s.type == "list":
-            print_list(s, f, globals(), locals())
-        else:
+        if s.do_exec:
             exec(s.action)
+        else:
+            print_list(s, f, globals(), locals())
 
 def begin_end_separation(rules):
-    begins = [ s for s in rules if s.pattern in ["B", "BEGIN" ] ]
-    regulars = [ s for s in rules if s.pattern not in ["B", "BEGIN", "E", "END" ] ]
-    ends = [ s for s in rules if s.pattern in ["E", "END" ] ]
+    begins = [ r for r in rules if r.pattern in ["B", "BEGIN" ] ]
+    regulars = [ r for r in rules if r.pattern not in ["B", "BEGIN", "E", "END" ] ]
+    ends = [ r for r in rules if r.pattern in ["E", "END" ] ]
     return begins, regulars, ends
 
 if __name__ == "__main__":
