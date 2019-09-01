@@ -3,7 +3,7 @@ import sys
 import ast
 import re
 
-__version__ = "0.9.1"
+__version__ = "0.9.2"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/py"
@@ -149,7 +149,7 @@ def split_fields(line):
 def print_list(rule, f, glo, loc):
     try:
         lst = eval(rule.action, glo, loc) if rule.action else f[1:]
-        print(" ".join([str(e) for e in lst]))
+        print(" ".join([str(e) for e in lst]), flush=True)
     except NameError as e:  # dynamic module load
         module = re.search(r'\'[^\']+\'', str(e)).group().strip("'")
         try:
@@ -172,12 +172,14 @@ def main_proc(header, begins, normals, ends, files):
     for r in begins:
         if r.do_exec:
             exec(r.action)
+            sys.stdout.flush()
         else:
             print_list(r, f, globals(), locals())
 
     if len(normals) == 0:
         for r in ends:
             exec(r.action)
+            sys.stdout.flush()
         sys.exit(0)
 
     if files == []:
@@ -207,6 +209,7 @@ def main_proc(header, begins, normals, ends, files):
 
                 if r.do_exec:
                     exec(r.action)
+                    sys.stdout.flush()
                 else:
                     print_list(r, f, globals(), locals())
 
@@ -215,6 +218,7 @@ def main_proc(header, begins, normals, ends, files):
     for r in ends:
         if r.do_exec:
             exec(r.action)
+            sys.stdout.flush()
         else:
             print_list(r, f, globals(), locals())
 
