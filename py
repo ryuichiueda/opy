@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys, os, ast, re
 
-__version__ = "0.8.2"
+__version__ = "0.8.3"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/py"
@@ -18,18 +18,16 @@ class Rule:
         self.action = action
         self.do_exec = do_exec
 
-def to_number(lst):
-    ans = []
-    for e in lst:
-        try:
-            a = int(e)
-        except:
-            try:    a = float(e)
-            except: a = e
+def to_number(s):
+    try:
+        return int(s)
+    except:
+        try:    return float(s)
+        except: return s
 
-        ans.append(a)
 
-    return ans
+def to_numbers(lst):
+    return [ to_number(e) for e in lst ]
 
 def parse_list_type(arg):
     for n in range(len(arg)-1):
@@ -115,7 +113,7 @@ def parse(rules, arg):
 
 def split_fields(line):
     line = line.rstrip('\n')
-    return [line] + to_number( line.split(' ') )
+    return [line] + to_numbers( line.split(' ') )
 
 def print_list(rule, f, glo, loc):
     try:
