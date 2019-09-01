@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys, os, ast, re
 
-__version__ = "0.9.0"
+__version__ = "0.9.1"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/py"
@@ -142,6 +142,7 @@ def main_proc(header, begins, normals, ends, files):
     global f
     NF = 0
     NR = 0
+    FNR = 0
 
     exec(header)
 
@@ -153,20 +154,35 @@ def main_proc(header, begins, normals, ends, files):
         for r in ends: exec(r.action)
         sys.exit(0)
 
-    for line in sys.stdin:
-        f = split_fields(line)
-        NF = len(f) - 1
-        NR += 1
+    if files == []:
+        files.append("-")
 
-        for n, e in enumerate(f):
-            exec("F" + str(n) + " = e ")
- 
-        for r in normals:
-            if r.pattern != "" and not eval(r.pattern):
-                continue
+    for filename in files:
+        if filename == "-":
+            h_file = sys.stdin
+        else:
+            h_file = open(filename, "r")
 
-            if r.do_exec: exec(r.action)
-            else:         print_list(r, f, globals(), locals())
+        FILENAME = filename
+        FNR = 0
+
+        for line in h_file:
+            f = split_fields(line)
+            NF = len(f) - 1
+            NR += 1
+            FNR += 1
+    
+            for n, e in enumerate(f):
+                exec("F" + str(n) + " = e ")
+     
+            for r in normals:
+                if r.pattern != "" and not eval(r.pattern):
+                    continue
+    
+                if r.do_exec: exec(r.action)
+                else:         print_list(r, f, globals(), locals())
+
+        h_file.close()
 
     for r in ends:
         if r.do_exec: exec(r.action)
