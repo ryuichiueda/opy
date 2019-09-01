@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
-import sys, os, ast, re
+import sys
+import ast
+import re
 
 __version__ = "0.9.1"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/py"
+
 
 def usage():
     print("py " + __version__, file=sys.stderr)
@@ -12,7 +15,9 @@ def usage():
     print("\nReleased under " + __license__, file=sys.stderr)
     print(__url__, file=sys.stderr)
 
+
 f = []
+
 
 def r_(rgx, s=None):
     if s is None:
@@ -20,28 +25,33 @@ def r_(rgx, s=None):
 
     return re.search(rgx, str(s))
 
+
 class Rule:
     def __init__(self, pattern, action, do_exec=False):
         self.pattern = pattern
         self.action = action
         self.do_exec = do_exec
 
+
 def to_number(s):
     try:
         return int(s)
-    except:
-        try:    return float(s)
-        except: return s
+    except ValueError:
+        try:
+            return float(s)
+        except ValueError:
+            return s
 
 
 def to_numbers(lst):
-    return [ to_number(e) for e in lst ]
+    return [to_number(e) for e in lst]
+
 
 def parse_list_type(arg):
     for n in range(len(arg)-1):
         if arg[-n-1] not in ":;":
             continue
-        
+
         action = arg[-n:].lstrip()
         if not test_parse(action):
             continue
@@ -57,9 +67,10 @@ def parse_list_type(arg):
 
     if test_parse(arg):
         return Rule("", arg), ""
-    
+
     print("parse error", file=sys.stderr)
     sys.exit(1)
+
 
 def test_parse(code):
     try:
@@ -67,6 +78,7 @@ def test_parse(code):
         return True
     except:
         return False
+
 
 def parse_proc_type(arg):
     for n in range(len(arg)-1):
@@ -90,11 +102,12 @@ def parse_proc_type(arg):
             continue
 
     action = arg.lstrip("{ ").rstrip("} ")
-    if test_parse(action): 
+    if test_parse(action):
         return Rule("", action, True), ""
 
     print("parse error", file=sys.stderr)
     sys.exit(1)
+
 
 def parse_pattern(arg):
     for n in range(len(arg)):
@@ -102,39 +115,49 @@ def parse_pattern(arg):
             continue
 
         pat = arg[-n:].lstrip().rstrip()
-        if test_parse(pat): return Rule(pat, ""), arg[:-n-1]
-        else:               pass
+        if test_parse(pat):
+            return Rule(pat, ""), arg[:-n-1]
+        else:
+            pass
 
     return Rule(arg, ""), ""
+
 
 def parse(rules, arg):
     arg = arg.rstrip()
     if arg == "":
         return rules
 
-    if arg[-1] == "]":   rule, remain = parse_list_type(arg)
-    elif arg[-1] == "}": rule, remain = parse_proc_type(arg)
-    else:                rule, remain = parse_pattern(arg)
+    if arg[-1] == "]":
+        rule, remain = parse_list_type(arg)
+    elif arg[-1] == "}":
+        rule, remain = parse_proc_type(arg)
+    else:
+        rule, remain = parse_pattern(arg)
 
-    if remain == "": return [rule] + rules
-    else:            return parse([rule] + rules, remain)
+    if remain == "":
+        return [rule] + rules
+    else:
+        return parse([rule] + rules, remain)
+
 
 def split_fields(line):
     line = line.rstrip('\n')
-    return [line] + to_numbers( line.split(' ') )
+    return [line] + to_numbers(line.split(' '))
+
 
 def print_list(rule, f, glo, loc):
     try:
         lst = eval(rule.action, glo, loc) if rule.action else f[1:]
-        print( " ".join([ str(e) for e in lst]) )
-    except NameError as e: #dynamic module load
+        print(" ".join([str(e) for e in lst]))
+    except NameError as e:  # dynamic module load
         module = re.search(r'\'[^\']+\'', str(e)).group().strip("'")
         try:
             exec("import " + module, globals())
-        except:
+        except NameError:
             print("Name error", file=sys.stderr)
             sys.exit(1)
-           
+
         print_list(rule, f, glo, loc)
 
 
@@ -147,11 +170,14 @@ def main_proc(header, begins, normals, ends, files):
     exec(header)
 
     for r in begins:
-        if r.do_exec: exec(r.action)
-        else:         print_list(r, f, globals(), locals())
+        if r.do_exec:
+            exec(r.action)
+        else:
+            print_list(r, f, globals(), locals())
 
     if len(normals) == 0:
-        for r in ends: exec(r.action)
+        for r in ends:
+            exec(r.action)
         sys.exit(0)
 
     if files == []:
@@ -171,28 +197,34 @@ def main_proc(header, begins, normals, ends, files):
             NF = len(f) - 1
             NR += 1
             FNR += 1
-    
+
             for n, e in enumerate(f):
                 exec("F" + str(n) + " = e ")
-     
+
             for r in normals:
                 if r.pattern != "" and not eval(r.pattern):
                     continue
-    
-                if r.do_exec: exec(r.action)
-                else:         print_list(r, f, globals(), locals())
+
+                if r.do_exec:
+                    exec(r.action)
+                else:
+                    print_list(r, f, globals(), locals())
 
         h_file.close()
 
     for r in ends:
-        if r.do_exec: exec(r.action)
-        else:         print_list(r, f, globals(), locals())
+        if r.do_exec:
+            exec(r.action)
+        else:
+            print_list(r, f, globals(), locals())
+
 
 def begin_end_separation(rules):
-    begins = [ r for r in rules if r.pattern in ["B", "BEGIN" ] ]
-    normals = [ r for r in rules if r.pattern not in ["B", "BEGIN", "E", "END" ] ]
-    ends = [ r for r in rules if r.pattern in ["E", "END" ] ]
+    begins = [r for r in rules if r.pattern in ["B", "BEGIN"]]
+    normals = [r for r in rules if r.pattern not in ["B", "BEGIN", "E", "END"]]
+    ends = [r for r in rules if r.pattern in ["E", "END"]]
     return begins, normals, ends
+
 
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "--help":
