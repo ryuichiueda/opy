@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys, os, ast, re
 
-__version__ = "0.8.1"
+__version__ = "0.8.2"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/py"
@@ -36,29 +36,31 @@ def parse_list_type(arg):
         if arg[-n-1] not in ":;":
             continue
         
-        if arg[-n-1] == ":":
-            try:
-                ast.parse(arg[-n:])
-                s, r = parse_pattern(arg[:-n-1])
-                return Rule(s.pattern, arg[-n:]), r
-            except:
-                pass
-        else:
-            try:
-                action = arg[-n:].lstrip()
-                ast.parse(action)
-                return Rule("", action), arg[:-n-1]
-            except:
-                pass
+        action = arg[-n:].lstrip()
+        if not test_parse(action):
+            continue
 
-    try:
-        ast.parse(arg)
+        if arg[-n-1] != ":":
+            return Rule("", action), arg[:-n-1]
+
+        try:
+            s, r = parse_pattern(arg[:-n-1])
+            return Rule(s.pattern, arg[-n:]), r
+        except:
+            continue
+
+    if test_parse(arg):
         return Rule("", arg), ""
-    except:
-        pass
     
     print("parse error", file=sys.stderr)
     sys.exit(1)
+
+def test_parse(code):
+    try:
+        ast.parse(code)
+        return True
+    except:
+        return False
 
 def parse_proc_type(arg):
     for n in range(len(arg)-1):
@@ -68,28 +70,22 @@ def parse_proc_type(arg):
         if arg[-n:].lstrip(" ")[0] != "{":
             continue
 
-        if arg[-n-1] == ":":
-            try:
-                action = arg[-n:].rstrip("} ").lstrip(" {")
-                ast.parse(action)
-                s, r = parse_pattern(arg[:-n-1])
-                return Rule(s.pattern, action, True), r
-            except:
-                pass
-        else:
-            try:
-                action = arg[-n:].rstrip("} ").lstrip(" {")
-                ast.parse(action)
-                return Rule("", action, True), arg[:-n-1]
-            except:
-                pass
+        action = arg[-n:].rstrip("} ").lstrip(" {")
+        if not test_parse(action):
+            continue
 
-    try:
-        action = arg.lstrip("{ ").rstrip("} ")
-        ast.parse(action)
+        if arg[-n-1] != ":":
+            return Rule("", action, True), arg[:-n-1]
+
+        try:
+            s, r = parse_pattern(arg[:-n-1])
+            return Rule(s.pattern, action, True), r
+        except:
+            continue
+
+    action = arg.lstrip("{ ").rstrip("} ")
+    if test_parse(action): 
         return Rule("", action, True), ""
-    except:
-        pass
 
     print("parse error", file=sys.stderr)
     sys.exit(1)
@@ -99,12 +95,9 @@ def parse_pattern(arg):
         if arg[-n-1] != ";":
             continue
 
-        try:
-            pat = arg[-n:].lstrip().rstrip()
-            ast.parse(pat)
-            return Rule(pat, ""), arg[:-n-1]
-        except:
-            pass
+        pat = arg[-n:].lstrip().rstrip()
+        if test_parse(pat): return Rule(pat, ""), arg[:-n-1]
+        else:               pass
 
     return Rule(arg, ""), ""
 
@@ -128,7 +121,7 @@ def print_list(rule, f, glo, loc):
     try:
         lst = eval(rule.action, glo, loc) if rule.action else f[1:]
         print( " ".join([ str(e) for e in lst]) )
-    except NameError as e:
+    except NameError as e: #dynamic module load
         module = re.search(r'\'[^\']+\'', str(e)).group().strip("'")
         try:
             exec("import " + module, globals())
