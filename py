@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys, os, ast, re
 
-__version__ = "0.8.0"
+__version__ = "0.8.1"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/py"
@@ -130,7 +130,12 @@ def print_list(rule, f, glo, loc):
         print( " ".join([ str(e) for e in lst]) )
     except NameError as e:
         module = re.search(r'\'[^\']+\'', str(e)).group().strip("'")
-        exec("import " + module, globals())
+        try:
+            exec("import " + module, globals())
+        except:
+            print("Name error", file=sys.stderr)
+            sys.exit(1)
+           
         print_list(rule, f, glo, loc)
 
 
