@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys, os, ast
 
-__version__ = "0.7.3"
+__version__ = "0.7.4"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/py"
@@ -124,11 +124,16 @@ def split_fields(line):
     line = line.rstrip('\n')
     return [line] + to_number( line.split(' ') )
 
+def print_list(rule, f, glo, loc):
+    lst = eval(rule.action, glo, loc) if rule.action else f[1:]
+    print( " ".join([ str(e) for e in lst]) )
+
 def main_proc(header, begins, normals, ends):
     exec(header)
+    f = []
     for s in begins:
         if s.type == "list":
-            print( " ".join([ str(e) for e in eval(s.action)]) )
+            print_list(s, f, globals(), locals())
         else:
             exec(s.action)
 
@@ -147,14 +152,13 @@ def main_proc(header, begins, normals, ends):
         for s in normals:
             if s.pattern == "" or eval(s.pattern):
                 if s.type == "list":
-                    lst = eval(s.action) if s.action else f[1:]
-                    print( " ".join([ str(e) for e in lst]) )
+                    print_list(s, f, globals(), locals())
                 else:
                     exec(s.action)
 
     for s in ends:
         if s.type == "list":
-            print( " ".join([ str(e) for e in eval(s.action)]) )
+            print_list(s, f, globals(), locals())
         else:
             exec(s.action)
 
