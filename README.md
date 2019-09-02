@@ -64,14 +64,14 @@ $ seq 4 | opy 'F1%2==0:[F1, ":even"];F1%2==1:[F1, ": odd"]'
 * BEGIN and END patterns
 
 ```
-$ seq 10 | opy 'B:{a=0};{a+=F1};E:{print(a)}'
+$ seq 10 | opy 'B:{a=0};{a+=F1};E:[a]'
 55
 ```
 
 or 
 
 ```
-$ seq 10 | opy 'BEGIN:{a=0};{a+=F1};END:{print(a)}'
+$ seq 10 | opy 'BEGIN:{a=0};{a+=F1};END:[a]'
 55
 ```
 
