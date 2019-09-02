@@ -3,7 +3,7 @@ import sys
 import ast
 import re
 
-__version__ = "0.9.3"
+__version__ = "1.0.0"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/py"
@@ -16,12 +16,12 @@ def usage():
     print(__url__, file=sys.stderr)
 
 
-f = []
+F = []
 
 
 def r_(rgx, s=None):
     if s is None:
-        s = f[0]
+        s = F[0]
 
     return re.search(rgx, str(s))
 
@@ -162,7 +162,7 @@ def print_list(rule, f, glo, loc):
 
 
 def main_proc(header, begins, normals, ends, files):
-    global f
+    global F
     NF = 0
     NR = 0
     FNR = 0
@@ -174,7 +174,7 @@ def main_proc(header, begins, normals, ends, files):
             exec(r.action)
             sys.stdout.flush()
         else:
-            print_list(r, f, globals(), locals())
+            print_list(r, F, globals(), locals())
 
     if len(normals) == 0:
         for r in ends:
@@ -195,12 +195,12 @@ def main_proc(header, begins, normals, ends, files):
         FNR = 0
 
         for line in h_file:
-            f = split_fields(line)
-            NF = len(f) - 1
+            F = split_fields(line)
+            NF = len(F) - 1
             NR += 1
             FNR += 1
 
-            for n, e in enumerate(f):
+            for n, e in enumerate(F):
                 exec("F" + str(n) + " = e ")
 
             for r in normals:
@@ -211,7 +211,7 @@ def main_proc(header, begins, normals, ends, files):
                     exec(r.action)
                     sys.stdout.flush()
                 else:
-                    print_list(r, f, globals(), locals())
+                    print_list(r, F, globals(), locals())
 
         h_file.close()
 
@@ -220,7 +220,7 @@ def main_proc(header, begins, normals, ends, files):
             exec(r.action)
             sys.stdout.flush()
         else:
-            print_list(r, f, globals(), locals())
+            print_list(r, F, globals(), locals())
 
 
 def begin_end_separation(rules):

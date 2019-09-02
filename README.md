@@ -105,7 +105,7 @@ $ seq 1 3 | opy '[ F1*math.pi, math.sin(F1) ]'
 ### list comprehension
 
 ```
-$ seq 1 100 | xargs -n 10 | opy '[ 1.0/x for x in f[1:3] ]'
+$ seq 1 100 | xargs -n 10 | opy '[ 1.0/x for x in F[1:3] ]'
 1.0 0.5
 0.09090909090909091 0.08333333333333333
 0.047619047619047616 0.045454545454545456
