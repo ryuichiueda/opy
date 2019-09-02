@@ -141,6 +141,12 @@ $ seq 10 | opy 'r_("[24680]", F1)'
 10
 ```
 
+* field concatenate 
+
+```
+$ echo {1..10} | $com '[Fs(2,4)]'
+2 3 4
+```
 
 ### input from file
 
