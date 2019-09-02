@@ -3,7 +3,7 @@ import sys
 import ast
 import re
 
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/py"
@@ -24,6 +24,10 @@ def r_(rgx, s=None):
         s = F[0]
 
     return re.search(rgx, str(s))
+
+
+def Fs(b, e):
+    return " ".join( [str(f) for f in F[b:e+1] ])
 
 
 class Rule:

@@ -143,3 +143,8 @@ com=./opy
   [ "$result" = "3" ]
 }
 
+@test "join shortcut" {
+  result=$( echo {1..10} | $com '[Fs(2,4)]' )
+  [ "$result" = "2 3 4" ]
+}
+
