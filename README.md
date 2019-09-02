@@ -1,4 +1,4 @@
-# opy: onelinerer's Python
+# opy: onelinerers' Python
 
  a Python wrapper that works like AWK or rb command
 
