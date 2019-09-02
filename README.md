@@ -43,22 +43,22 @@ $ seq 10 | opy 'F1%2==0:{F1= str(F1)+" " ; print(F1,end="")}'
 * pattern and list action
 
 ```
-$ seq 10 | opy 'F1%2==0:[F1, ":even"]'
-2 :even
-4 :even
-6 :even
-8 :even
-10 :even
+$ seq 10 | opy 'F1%2==0:[F1, ": even"]'
+2 : even
+4 : even
+6 : even
+8 : even
+10 : even
 ```
 
 * muitliple rules:
 
 ```
-$ seq 4 | opy 'F1%2==0:[F1, ":even"];F1%2==1:[F1, ":odd"]'
-1 :odd
-2 :even
-3 :odd
-4 :even
+$ seq 4 | opy 'F1%2==0:[F1, ":even"];F1%2==1:[F1, ": odd"]'
+1 : odd
+2 : even
+3 : odd
+4 : even
 ```
 
 * BEGIN and END patterns
@@ -100,7 +100,7 @@ $ seq 1 3 | opy '[ F1*math.pi, math.sin(F1) ]'
 9.42477796076938 0.1411200080598672
 ```
 
-* note: It works only in the list action. Each element must not be changed in the list.
+* note: It works only in list actions. Each element must not be changed in the list.
 
 ### list comprehension
 
