@@ -148,3 +148,11 @@ $ seq 10 | opy 'r_("[24680]", F1)'
 $ opy 'NR==1' $(which opy)
 #!/usr/bin/env python3
 ```
+
+
+## options
+
+* `--help`: show help
+* `-m` <import sentences>: load of modules
+* `-s`: string mode
+    * prohibit automatic number conversions.
