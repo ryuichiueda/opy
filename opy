@@ -3,7 +3,7 @@ import sys
 import ast
 import re
 
-__version__ = "1.0.1"
+__version__ = "1.1.0"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/py"
@@ -141,9 +141,12 @@ def parse(rules, arg):
         return parse([rule] + rules, remain)
 
 
-def split_fields(line):
+def split_fields(line, str_mode):
     line = line.rstrip('\n')
-    return [line] + to_numbers(line.split(' '))
+    if str_mode:
+        return [line] + line.split(' ')
+    else:
+        return [line] + to_numbers(line.split(' '))
 
 
 def print_list(rule, f, glo, loc):
@@ -161,7 +164,7 @@ def print_list(rule, f, glo, loc):
         print_list(rule, f, glo, loc)
 
 
-def main_proc(header, begins, normals, ends, files):
+def main_proc(header, begins, normals, ends, files, str_mode):
     global F
     NF = 0
     NR = 0
@@ -195,7 +198,7 @@ def main_proc(header, begins, normals, ends, files):
         FNR = 0
 
         for line in h_file:
-            F = split_fields(line)
+            F = split_fields(line, str_mode)
             NF = len(F) - 1
             NR += 1
             FNR += 1
@@ -230,21 +233,34 @@ def begin_end_separation(rules):
     return begins, normals, ends
 
 
+def set_str_mode():
+    if "-s" in sys.argv:
+        sys.argv.remove("-s")
+        return True
+     
+    return False
+
+
+def get_header():
+    if "-m" in sys.argv:
+        pos = sys.argv.index("-m")
+        header = sys.argv[pos+1]
+        sys.argv.remove("-m")
+        sys.argv.remove(header)
+        return header
+
+    return ""
+
+
 if __name__ == "__main__":
     if len(sys.argv) < 2 or sys.argv[1] == "--help":
         usage()
         sys.exit(1)
 
-    files = []
-    if len(sys.argv) > 2 and sys.argv[1] == "-m":
-        header, code = sys.argv[2:4]
-        if len(sys.argv) > 4:
-            files = sys.argv[4:]
-    else:
-        header, code = "", sys.argv[1]
-        if len(sys.argv) > 2:
-            files = sys.argv[2:]
+    str_mode = set_str_mode()
+    header = get_header()
+    files = sys.argv[2:] if len(sys.argv) > 2 else []
 
-    rules = parse([], code)
+    rules = parse([], sys.argv[1])
     begins, normals, ends = begin_end_separation(rules)
-    main_proc(header, begins, normals, ends, files)
+    main_proc(header, begins, normals, ends, files, str_mode)

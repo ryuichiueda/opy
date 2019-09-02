@@ -138,3 +138,8 @@ com=./opy
   [ "$result" = "./opy -" ]
 }
 
+@test "string mode" {
+  result=$( seq 10 | $com -s 'F1=="3"' )
+  [ "$result" = "3" ]
+}
+
