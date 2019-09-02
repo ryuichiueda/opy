@@ -84,13 +84,23 @@ $ opy 'B:[1+1]'
 
 ### import of modules
 
-````
+```
 $ seq 1 3 | opy -m 'import math' '[ F1*math.pi, math.sin(F1) ]' 
 3.141592653589793 0.8414709848078965
 6.283185307179586 0.9092974268256817
 9.42477796076938 0.1411200080598672
-````
+```
 
+### dynamic load of modules 
+
+```
+$ seq 1 3 | opy '[ F1*math.pi, math.sin(F1) ]' 
+3.141592653589793 0.8414709848078965
+6.283185307179586 0.9092974268256817
+9.42477796076938 0.1411200080598672
+```
+
+* note: It works only in the list action. Each element must not be changed in the list.
 
 ### list comprehension
 
@@ -106,4 +116,24 @@ $ seq 1 100 | xargs -n 10 | opy '[ 1.0/x for x in f[1:3] ]'
 0.014084507042253521 0.013888888888888888
 0.012345679012345678 0.012195121951219513
 0.01098901098901099 0.010869565217391304
+```
+
+### original function
+
+* regular expression match (wrapper of re.search)
+
+```
+$ seq 10 | opy 'r_("[24680]")'
+2
+4
+6
+8
+10
+```
+
+### input from file
+
+```
+$ opy 'NR==1' $(which opy)
+#!/usr/bin/env python3
 ```
