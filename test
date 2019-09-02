@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
 
-com=./py
+com=./opy
 
 @test "pattern" {
   result=$(seq 10 | $com 'F1%2==0' | xargs )
@@ -119,22 +119,22 @@ com=./py
 }
 
 @test "regex" {
-  result=$( seq 10 | ./py 'r_("[24680]$")' | xargs )
+  result=$( seq 10 | $com 'r_("[24680]$")' | xargs )
   [ "$result" = "2 4 6 8 10" ]
 }
 
 @test "field regex" {
-  result=$( seq 10 | xargs -n 2 | ./py 'r_("[48]$",F2)' | xargs )
+  result=$( seq 10 | xargs -n 2 | $com 'r_("[48]$",F2)' | xargs )
   [ "$result" = "3 4 7 8" ]
 }
 
 @test "file and FNR" {
-  result=$( $com 'FNR==1' ./py ./test | xargs)
+  result=$( $com 'FNR==1' ./opy ./test | xargs)
   [ "$result" = "#!/usr/bin/env python3 #!/usr/bin/env bats" ]
 }
 
 @test "FILENAME" {
-  result=$( seq 10 | $com 'FNR==1:[FILENAME]' ./py "-" | xargs)
-  [ "$result" = "./py -" ]
+  result=$( seq 10 | $com 'FNR==1:[FILENAME]' ./opy "-" | xargs)
+  [ "$result" = "./opy -" ]
 }
 
