@@ -3,7 +3,7 @@ import sys
 import ast
 import re
 
-__version__ = "0.9.2"
+__version__ = "0.9.3"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/py"
@@ -231,7 +231,7 @@ def begin_end_separation(rules):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1 and sys.argv[1] == "--help":
+    if len(sys.argv) < 2 or sys.argv[1] == "--help":
         usage()
         sys.exit(1)
 
