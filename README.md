@@ -153,6 +153,6 @@ $ opy 'NR==1' $(which opy)
 ## options
 
 * `--help`: show help
-* `-m` <import sentences>: load of modules
+* `-m <import sentences>`: load modules
 * `-s`: string mode
     * prohibit automatic number conversions.
