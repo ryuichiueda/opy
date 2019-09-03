@@ -3,7 +3,7 @@ import sys
 import ast
 import re
 
-__version__ = "1.2.3"
+__version__ = "1.2.2"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/py"
@@ -219,20 +219,18 @@ def main_proc(header, begins, normals, ends, files, str_mode):
 
                 if r.do_exec:
                     exec(r.action)
+                    sys.stdout.flush()
                 else:
                     print_list(r, F, globals(), locals())
-
-                sys.stdout.flush()
 
         h_file.close()
 
     for r in ends:
         if r.do_exec:
             exec(r.action)
+            sys.stdout.flush()
         else:
             print_list(r, F, globals(), locals())
-
-        sys.stdout.flush()
 
 
 def begin_end_separation(rules):
@@ -269,6 +267,10 @@ if __name__ == "__main__":
     str_mode = set_str_mode()
     header = get_header()
     files = sys.argv[2:] if len(sys.argv) > 2 else ["-"]
+
+    #if files == []:
+    #    files.append("-")
+
     rules = Parser().parse([], sys.argv[1])
     begins, normals, ends = begin_end_separation(rules)
     main_proc(header, begins, normals, ends, files, str_mode)
