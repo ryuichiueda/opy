@@ -162,3 +162,11 @@ $ opy 'NR==1' $(which opy)
 * `-m <import sentences>`: load modules
 * `-s`: string mode
     * prohibit automatic number conversions.
+* `-i, -o`: input/output field separator
+
+```
+$ echo '1,2,3,4,5' | opy -i , '[F2]'
+2
+$ echo '1,2,3,4,5' | opy -i , -o x '[Fs(2,4)]'
+2x3x4
+```
