@@ -3,7 +3,7 @@ import sys
 import ast
 import re
 
-__version__ = "1.3.0"
+__version__ = "1.3.1"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/py"
@@ -135,13 +135,7 @@ def r_(rgx, s=None):
     return re.search(rgx, str(s))
 
 
-def Fs(b, e):
-    return OFS.join( [str(f) for f in F[b:e+1] ])
-
-#################################################
-
-
-def to_number(s):
+def n_(s):
     try:
         return int(s)
     except ValueError:
@@ -151,8 +145,14 @@ def to_number(s):
             return s
 
 
+def Fs(b, e):
+    return OFS.join( [str(f) for f in F[b:e+1] ])
+
+#################################################
+
+
 def to_numbers(lst):
-    return [to_number(e) for e in lst]
+    return [n_(e) for e in lst]
 
 
 def split_fields(line, str_mode):
