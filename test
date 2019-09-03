@@ -148,3 +148,8 @@ com=./opy
   [ "$result" = "2 3 4" ]
 }
 
+@test "field separator" {
+  result=$( echo {1..10} | tr ' ' , | $com -i , -o @ '[Fs(2,4)]' )
+  [ "$result" = "2@3@4" ]
+}
+

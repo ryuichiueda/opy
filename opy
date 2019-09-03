@@ -3,7 +3,7 @@ import sys
 import ast
 import re
 
-__version__ = "1.2.4"
+__version__ = "1.3.0"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/py"
@@ -125,7 +125,8 @@ class Parser:
 #################################################
 # data and functions for user
 F = []
-
+OFS = " "
+IFS = " "
 
 def r_(rgx, s=None):
     if s is None:
@@ -135,7 +136,7 @@ def r_(rgx, s=None):
 
 
 def Fs(b, e):
-    return " ".join( [str(f) for f in F[b:e+1] ])
+    return OFS.join( [str(f) for f in F[b:e+1] ])
 
 #################################################
 
@@ -157,9 +158,9 @@ def to_numbers(lst):
 def split_fields(line, str_mode):
     line = line.rstrip('\n')
     if str_mode:
-        return [line] + line.split(' ')
+        return [line] + line.split(IFS)
     else:
-        return [line] + to_numbers(line.split(' '))
+        return [line] + to_numbers(line.split(IFS))
 
 
 def dynamic_module_import(msg):
@@ -174,7 +175,7 @@ def dynamic_module_import(msg):
 def print_list(rule, f, glo, loc):
     try:
         lst = eval(rule.action, glo, loc) if rule.action else f[1:]
-        print(" ".join([str(e) for e in lst]))
+        print(OFS.join([str(e) for e in lst]))
     except NameError as e:
         dynamic_module_import(e)
         print_list(rule, f, glo, loc)
@@ -209,7 +210,7 @@ def main_proc(header, begins, normals, ends, files, str_mode):
         FNR = 0
 
         for line in h_file:
-            F = split_fields(line, str_mode)
+            F = split_fields(line, str_mode) 
             NF = len(F) - 1
             NR += 1
             FNR += 1
@@ -258,6 +259,28 @@ def get_header():
     return ""
 
 
+def get_ifs():
+    ifs = " "
+    if "-i" in sys.argv:
+        pos = sys.argv.index("-i")
+        ifs = sys.argv[pos+1]
+        sys.argv.remove("-i")
+        sys.argv.remove(ifs)
+
+    return ifs
+
+
+def get_ofs():
+    ofs = " "
+    if "-o" in sys.argv:
+        pos = sys.argv.index("-o")
+        ofs = sys.argv[pos+1]
+        sys.argv.remove("-o")
+        sys.argv.remove(ofs)
+
+    return ofs
+
+
 if __name__ == "__main__":
     if len(sys.argv) < 2 or sys.argv[1] == "--help":
         usage()
@@ -265,6 +288,8 @@ if __name__ == "__main__":
 
     str_mode = set_str_mode()
     header = get_header()
+    IFS = get_ifs()
+    OFS = get_ofs()
     files = sys.argv[2:] if len(sys.argv) > 2 else ["-"]
     p = Parser(sys.argv[1])
     main_proc(header, p.begins, p.normals, p.ends, files, str_mode)
