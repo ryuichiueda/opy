@@ -3,7 +3,7 @@ import sys
 import ast
 import re
 
-__version__ = "1.2.3"
+__version__ = "1.2.4"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/py"
@@ -24,64 +24,68 @@ class Rule:
 
 
 class Parser:
-    def parse(self, rules, arg):
-        arg = arg.rstrip()
+    def __init__(self, arg):
+        rules = []
+        while arg != "":
+            rule, arg = self.__get_rule(arg)
+            if rule != "":
+                rules.insert(0, rule)
+
+        self.begins = [r for r in rules if r.pattern in ["B", "BEGIN"] ]
+        self.ends = [r for r in rules if r.pattern in ["E","END"] ]
+        self.normals = [r for r in rules if r not in self.begins + self.ends ]
+
+
+    def __get_rule(self, arg):
+        arg = arg.strip()
         if arg == "":
-            return rules
-    
-        if arg[-1] == "]":
-            rule, remain = self.parse_list_type(arg)
+            return "", ""
+        elif arg[-1] == "]":
+            return self.__list(arg)
         elif arg[-1] == "}":
-            rule, remain = self.parse_proc_type(arg)
+            return self.__action(arg)
         else:
-            rule, remain = self.parse_pattern(arg)
-    
-        if remain == "":
-            return [rule] + rules
-        else:
-            return self.parse([rule] + rules, remain)
+            return self.__pattern(arg)
 
 
-    def parse_pattern(self, arg):
+    def __pattern(self, arg):
         for n in range(len(arg)):
             if arg[-n-1] != ";":
                 continue
     
             pat = arg[-n:].strip()
-            if self.test_parse(pat):
+            if self.__test(pat):
                 return Rule(pat, ""), arg[:-n-1]
-            else:
-                pass
     
         return Rule(arg, ""), ""
 
 
-    def parse_list_type(self, arg):
+    def __list(self, arg):
         for n in range(len(arg)-1):
             if arg[-n-1] not in ":;":
                 continue
     
-            action = arg[-n:].lstrip()
-            if not self.test_parse(action):
+            proc = arg[-n:].lstrip()
+            if not self.__test(proc):
                 continue
     
             if arg[-n-1] != ":":
-                return Rule("", action), arg[:-n-1]
+                return Rule("", proc), arg[:-n-1]
     
             try:
-                s, r = self.parse_pattern(arg[:-n-1])
+                s, r = self.__pattern(arg[:-n-1])
                 return Rule(s.pattern, arg[-n:]), r
             except:
                 continue
     
-        if self.test_parse(arg):
+        if self.__test(arg):
             return Rule("", arg), ""
     
         print("parse error", file=sys.stderr)
         sys.exit(1)
 
 
-    def parse_proc_type(self, arg):
+    def __action(self, arg):
         for n in range(len(arg)-1):
             if arg[-n-1] not in ":;":
                 continue
@@ -89,28 +93,28 @@ class Parser:
             if arg[-n:].lstrip(" ")[0] != "{":
                 continue
     
-            action = arg[-n:].rstrip("} ").lstrip(" {")
-            if not self.test_parse(action):
+            proc = arg[-n:].rstrip("} ").lstrip(" {")
+            if not self.__test(proc):
                 continue
     
             if arg[-n-1] != ":":
-                return Rule("", action, True), arg[:-n-1]
+                return Rule("", proc, True), arg[:-n-1]
     
             try:
-                s, r = self.parse_pattern(arg[:-n-1])
-                return Rule(s.pattern, action, True), r
+                s, r = self.__pattern(arg[:-n-1])
+                return Rule(s.pattern, proc, True), r
             except:
                 continue
     
-        action = arg.lstrip("{ ").rstrip("} ")
-        if self.test_parse(action):
-            return Rule("", action, True), ""
+        proc = arg.lstrip("{ ").rstrip("} ")
+        if self.__test(proc):
+            return Rule("", proc, True), ""
     
         print("parse error", file=sys.stderr)
         sys.exit(1)
 
 
-    def test_parse(self, code):
+    def __test(self, code):
         try:
             ast.parse(code)
             return True
@@ -235,13 +239,6 @@ def main_proc(header, begins, normals, ends, files, str_mode):
         sys.stdout.flush()
 
 
-def begin_end_separation(rules):
-    begins = [r for r in rules if r.pattern in ["B", "BEGIN"]]
-    normals = [r for r in rules if r.pattern not in ["B", "BEGIN", "E", "END"]]
-    ends = [r for r in rules if r.pattern in ["E", "END"]]
-    return begins, normals, ends
-
-
 def set_str_mode():
     if "-s" in sys.argv:
         sys.argv.remove("-s")
@@ -269,6 +266,5 @@ if __name__ == "__main__":
     str_mode = set_str_mode()
     header = get_header()
     files = sys.argv[2:] if len(sys.argv) > 2 else ["-"]
-    rules = Parser().parse([], sys.argv[1])
-    begins, normals, ends = begin_end_separation(rules)
-    main_proc(header, begins, normals, ends, files, str_mode)
+    p = Parser(sys.argv[1])
+    main_proc(header, p.begins, p.normals, p.ends, files, str_mode)
