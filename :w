@@ -155,7 +155,7 @@ com=./opy
 
 
 @test "regex input separator" {
-  result=$( echo a33b313c | tr ' ' , | $com -I '\d+' '[Fs(1,3)]' )
-  [ "$result" = "a b c" ]
+  result=$( echo {1..10} | tr ' ' , | $com -i -r '\d' -o @ '[Fs(2,4)]' )
+  [ "$result" = "2@3@4" ]
 }
 

@@ -3,7 +3,7 @@ import sys
 import ast
 import re
 
-__version__ = "1.3.1"
+__version__ = "1.3.2"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/py"
@@ -127,6 +127,7 @@ class Parser:
 F = []
 OFS = " "
 IFS = " "
+IFSREGEX = False
 
 def r_(rgx, s=None):
     if s is None:
@@ -157,10 +158,12 @@ def to_numbers(lst):
 
 def split_fields(line, str_mode):
     line = line.rstrip('\n')
+    fs = re.split(IFS, line) if IFSREGEX else line.split(IFS)
+
     if str_mode:
-        return [line] + line.split(IFS)
+        return [line] + fs
     else:
-        return [line] + to_numbers(line.split(IFS))
+        return [line] + to_numbers(fs)
 
 
 def dynamic_module_import(msg):
@@ -261,13 +264,22 @@ def get_header():
 
 def get_ifs():
     ifs = " "
+    regex = False
+
     if "-i" in sys.argv:
         pos = sys.argv.index("-i")
         ifs = sys.argv[pos+1]
         sys.argv.remove("-i")
         sys.argv.remove(ifs)
+        regex = False
+    elif "-I" in sys.argv:
+        pos = sys.argv.index("-I")
+        ifs = sys.argv[pos+1]
+        sys.argv.remove("-I")
+        sys.argv.remove(ifs)
+        regex = True
 
-    return ifs
+    return ifs, regex
 
 
 def get_ofs():
@@ -288,7 +300,7 @@ if __name__ == "__main__":
 
     str_mode = set_str_mode()
     header = get_header()
-    IFS = get_ifs()
+    IFS, IFSREGEX = get_ifs()
     OFS = get_ofs()
     files = sys.argv[2:] if len(sys.argv) > 2 else ["-"]
     p = Parser(sys.argv[1])

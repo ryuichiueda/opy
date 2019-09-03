@@ -170,3 +170,10 @@ $ echo '1,2,3,4,5' | opy -i , '[F2]'
 $ echo '1,2,3,4,5' | opy -i , -o x '[Fs(2,4)]'
 2x3x4
 ```
+
+* `-I`: regex input field separator
+
+```
+$ echo a33b313c | tr ' ' , | opy -I '\d+' '[Fs(1,3)]'
+a b c
+```
