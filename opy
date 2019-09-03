@@ -3,7 +3,7 @@ import sys
 import ast
 import re
 
-__version__ = "1.2.0"
+__version__ = "1.2.2"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/py"
@@ -16,6 +16,110 @@ def usage():
     print(__url__, file=sys.stderr)
 
 
+class Rule:
+    def __init__(self, pattern, action, do_exec=False):
+        self.pattern = pattern
+        self.action = action
+        self.do_exec = do_exec
+
+
+class Parser:
+    def parse(self, rules, arg):
+        arg = arg.rstrip()
+        if arg == "":
+            return rules
+    
+        if arg[-1] == "]":
+            rule, remain = self.parse_list_type(arg)
+        elif arg[-1] == "}":
+            rule, remain = self.parse_proc_type(arg)
+        else:
+            rule, remain = self.parse_pattern(arg)
+    
+        if remain == "":
+            return [rule] + rules
+        else:
+            return self.parse([rule] + rules, remain)
+
+
+    def parse_pattern(self, arg):
+        for n in range(len(arg)):
+            if arg[-n-1] != ";":
+                continue
+    
+            pat = arg[-n:].strip()
+            if self.test_parse(pat):
+                return Rule(pat, ""), arg[:-n-1]
+            else:
+                pass
+    
+        return Rule(arg, ""), ""
+
+
+    def parse_list_type(self, arg):
+        for n in range(len(arg)-1):
+            if arg[-n-1] not in ":;":
+                continue
+    
+            action = arg[-n:].lstrip()
+            if not self.test_parse(action):
+                continue
+    
+            if arg[-n-1] != ":":
+                return Rule("", action), arg[:-n-1]
+    
+            try:
+                s, r = self.parse_pattern(arg[:-n-1])
+                return Rule(s.pattern, arg[-n:]), r
+            except:
+                continue
+    
+        if self.test_parse(arg):
+            return Rule("", arg), ""
+    
+        print("parse error", file=sys.stderr)
+        sys.exit(1)
+
+
+    def parse_proc_type(self, arg):
+        for n in range(len(arg)-1):
+            if arg[-n-1] not in ":;":
+                continue
+    
+            if arg[-n:].lstrip(" ")[0] != "{":
+                continue
+    
+            action = arg[-n:].rstrip("} ").lstrip(" {")
+            if not self.test_parse(action):
+                continue
+    
+            if arg[-n-1] != ":":
+                return Rule("", action, True), arg[:-n-1]
+    
+            try:
+                s, r = self.parse_pattern(arg[:-n-1])
+                return Rule(s.pattern, action, True), r
+            except:
+                continue
+    
+        action = arg.lstrip("{ ").rstrip("} ")
+        if self.test_parse(action):
+            return Rule("", action, True), ""
+    
+        print("parse error", file=sys.stderr)
+        sys.exit(1)
+
+
+    def test_parse(self, code):
+        try:
+            ast.parse(code)
+            return True
+        except:
+            return False
+
+
+#################################################
+# data and functions for user
 F = []
 
 
@@ -29,12 +133,7 @@ def r_(rgx, s=None):
 def Fs(b, e):
     return " ".join( [str(f) for f in F[b:e+1] ])
 
-
-class Rule:
-    def __init__(self, pattern, action, do_exec=False):
-        self.pattern = pattern
-        self.action = action
-        self.do_exec = do_exec
+#################################################
 
 
 def to_number(s):
@@ -49,100 +148,6 @@ def to_number(s):
 
 def to_numbers(lst):
     return [to_number(e) for e in lst]
-
-
-def parse_list_type(arg):
-    for n in range(len(arg)-1):
-        if arg[-n-1] not in ":;":
-            continue
-
-        action = arg[-n:].lstrip()
-        if not test_parse(action):
-            continue
-
-        if arg[-n-1] != ":":
-            return Rule("", action), arg[:-n-1]
-
-        try:
-            s, r = parse_pattern(arg[:-n-1])
-            return Rule(s.pattern, arg[-n:]), r
-        except:
-            continue
-
-    if test_parse(arg):
-        return Rule("", arg), ""
-
-    print("parse error", file=sys.stderr)
-    sys.exit(1)
-
-
-def test_parse(code):
-    try:
-        ast.parse(code)
-        return True
-    except:
-        return False
-
-
-def parse_proc_type(arg):
-    for n in range(len(arg)-1):
-        if arg[-n-1] not in ":;":
-            continue
-
-        if arg[-n:].lstrip(" ")[0] != "{":
-            continue
-
-        action = arg[-n:].rstrip("} ").lstrip(" {")
-        if not test_parse(action):
-            continue
-
-        if arg[-n-1] != ":":
-            return Rule("", action, True), arg[:-n-1]
-
-        try:
-            s, r = parse_pattern(arg[:-n-1])
-            return Rule(s.pattern, action, True), r
-        except:
-            continue
-
-    action = arg.lstrip("{ ").rstrip("} ")
-    if test_parse(action):
-        return Rule("", action, True), ""
-
-    print("parse error", file=sys.stderr)
-    sys.exit(1)
-
-
-def parse_pattern(arg):
-    for n in range(len(arg)):
-        if arg[-n-1] != ";":
-            continue
-
-        pat = arg[-n:].lstrip().rstrip()
-        if test_parse(pat):
-            return Rule(pat, ""), arg[:-n-1]
-        else:
-            pass
-
-    return Rule(arg, ""), ""
-
-
-def parse(rules, arg):
-    arg = arg.rstrip()
-    if arg == "":
-        return rules
-
-    if arg[-1] == "]":
-        rule, remain = parse_list_type(arg)
-    elif arg[-1] == "}":
-        rule, remain = parse_proc_type(arg)
-    else:
-        rule, remain = parse_pattern(arg)
-
-    if remain == "":
-        return [rule] + rules
-    else:
-        return parse([rule] + rules, remain)
 
 
 def split_fields(line, str_mode):
@@ -265,6 +270,6 @@ if __name__ == "__main__":
     header = get_header()
     files = sys.argv[2:] if len(sys.argv) > 2 else []
 
-    rules = parse([], sys.argv[1])
+    rules = Parser().parse([], sys.argv[1])
     begins, normals, ends = begin_end_separation(rules)
     main_proc(header, begins, normals, ends, files, str_mode)
