@@ -144,7 +144,7 @@ $ seq 10 | opy 'r_("[24680]", F1)'
 * field concatenate 
 
 ```
-$ echo {1..10} | $com '[Fs(2,4)]'
+$ echo {1..10} | opy '[Fs(2,4)]'
 2 3 4
 ```
 
