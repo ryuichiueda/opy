@@ -159,3 +159,8 @@ com=./opy
   [ "$result" = "a b c" ]
 }
 
+@test "begin and end without input" {
+  result=$( $com 'B:{a,b=1,2};E:[a,b]' )
+  [ "$result" = "1 2" ]
+}
+

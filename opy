@@ -3,7 +3,7 @@ import sys
 import ast
 import re
 
-__version__ = "1.3.2"
+__version__ = "1.3.3"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/py"
@@ -201,6 +201,14 @@ def main_proc(header, begins, normals, ends, files, str_mode):
         sys.stdout.flush()
 
     if len(normals) == 0:
+        for r in ends:
+            if r.do_exec:
+                exec(r.action)
+            else:
+                print_list(r, F, globals(), locals())
+    
+            sys.stdout.flush()
+
         sys.exit(0)
 
     for filename in files:
