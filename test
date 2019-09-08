@@ -18,8 +18,13 @@ com=./opy
 }
 
 @test "module import" {
-  result=$( echo 3.141592 | $com -m "import math" '[round(math.sin(F1/4),3)]' )
+  result=$( echo 3.141592 | $com -m math '[round(math.sin(F1/4),3)]' )
   [ "$result" = "0.707" ]
+}
+
+@test "module multiple import" {
+  result=$( echo 3.141592 | $com -m math,numpy '[math.pi,numpy.pi]' )
+  [ "$result" = "3.141592653589793 3.141592653589793" ]
 }
 
 @test "action" {

@@ -3,7 +3,7 @@ import sys
 import ast
 import re
 
-__version__ = "1.3.3"
+__version__ = "1.4.0"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/py"
@@ -184,13 +184,14 @@ def print_list(rule, f, glo, loc):
         print_list(rule, f, glo, loc)
 
 
-def main_proc(header, begins, normals, ends, files, str_mode):
+def main_proc(headers, begins, normals, ends, files, str_mode):
     global F
     NF = 0
     NR = 0
     FNR = 0
 
-    exec(header)
+    for h in headers:
+        exec("import " + h)
 
     for r in begins:
         if r.do_exec:
@@ -262,10 +263,10 @@ def set_str_mode():
 def get_header():
     if "-m" in sys.argv:
         pos = sys.argv.index("-m")
-        header = sys.argv[pos+1]
+        modules = sys.argv[pos+1]
         sys.argv.remove("-m")
-        sys.argv.remove(header)
-        return header
+        sys.argv.remove(modules)
+        return modules.split(",;")
 
     return ""
 
@@ -307,9 +308,9 @@ if __name__ == "__main__":
         sys.exit(1)
 
     str_mode = set_str_mode()
-    header = get_header()
+    headers = get_header()
     IFS, IFSREGEX = get_ifs()
     OFS = get_ofs()
     files = sys.argv[2:] if len(sys.argv) > 2 else ["-"]
     p = Parser(sys.argv[1])
-    main_proc(header, p.begins, p.normals, p.ends, files, str_mode)
+    main_proc(headers, p.begins, p.normals, p.ends, files, str_mode)
