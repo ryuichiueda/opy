@@ -4,6 +4,14 @@
 
 [![Build Status](https://travis-ci.org/ryuichiueda/opy.svg?branch=master)](https://travis-ci.org/ryuichiueda/opy)
 
+## install
+
+The `opy` file is copied to `/usr/local/bin/` with the following command.
+
+```
+$ sudo make install
+```
+
 ## usage 
 
 ### pattern/action/list action
