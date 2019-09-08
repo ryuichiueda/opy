@@ -93,7 +93,7 @@ $ opy 'B:[1+1]'
 ### import of modules
 
 ```
-$ seq 1 3 | opy -m 'import math' '[ F1*math.pi, math.sin(F1) ]' 
+$ seq 1 3 | opy -m math '[ F1*math.pi, math.sin(F1) ]' 
 3.141592653589793 0.8414709848078965
 6.283185307179586 0.9092974268256817
 9.42477796076938 0.1411200080598672
@@ -167,7 +167,7 @@ $ opy 'NR==1' $(which opy)
 ## options
 
 * `--help`: show help
-* `-m <import sentences>`: load modules
+* `-m <modules>`: load modules
 * `-s`: string mode
     * prohibit automatic number conversions.
 * `-i, -o`: input/output field separator
