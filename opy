@@ -3,7 +3,7 @@ import sys
 import ast
 import re
 
-__version__ = "1.4.0"
+__version__ = "1.4.1"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/py"
@@ -184,14 +184,14 @@ def print_list(rule, f, glo, loc):
         print_list(rule, f, glo, loc)
 
 
-def main_proc(headers, begins, normals, ends, files, str_mode):
+def main_proc(modules, begins, normals, ends, files, str_mode):
     global F
     NF = 0
     NR = 0
     FNR = 0
 
-    for h in headers:
-        exec("import " + h)
+    if modules != "":
+        exec("import " + modules)
 
     for r in begins:
         if r.do_exec:
@@ -266,7 +266,7 @@ def get_header():
         modules = sys.argv[pos+1]
         sys.argv.remove("-m")
         sys.argv.remove(modules)
-        return modules.split(",;")
+        return modules
 
     return ""
 
@@ -308,9 +308,9 @@ if __name__ == "__main__":
         sys.exit(1)
 
     str_mode = set_str_mode()
-    headers = get_header()
+    modules = get_header()
     IFS, IFSREGEX = get_ifs()
     OFS = get_ofs()
     files = sys.argv[2:] if len(sys.argv) > 2 else ["-"]
     p = Parser(sys.argv[1])
-    main_proc(headers, p.begins, p.normals, p.ends, files, str_mode)
+    main_proc(modules, p.begins, p.normals, p.ends, files, str_mode)

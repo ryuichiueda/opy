@@ -23,7 +23,7 @@ com=./opy
 }
 
 @test "module multiple import" {
-  result=$( echo 3.141592 | $com -m math,numpy '[math.pi,numpy.pi]' )
+  result=$( $com -m math,numpy 'B:[math.pi,numpy.pi]' )
   [ "$result" = "3.141592653589793 3.141592653589793" ]
 }
 
