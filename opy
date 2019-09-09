@@ -3,17 +3,19 @@ import sys
 import ast
 import re
 
-__version__ = "1.4.3"
+__version__ = "1.4.4"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
 
 
 def usage():
-    print("opy " + __version__, file=sys.stderr)
+    print("opy " + __version__ + "\n", file=sys.stderr)
     print("Copyright 2019 " + __author__, file=sys.stderr)
-    print("\nReleased under " + __license__, file=sys.stderr)
+    print("Released under " + __license__, file=sys.stderr)
     print(__url__, file=sys.stderr)
+    print("\nYou are using Python {}.{}.{} with this command.".format(*sys.version_info[0:3]),
+          file=sys.stderr)
 
 
 class Rule:
