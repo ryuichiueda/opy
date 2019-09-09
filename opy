@@ -3,10 +3,10 @@ import sys
 import ast
 import re
 
-__version__ = "1.4.2"
+__version__ = "1.4.3"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
-__url__ = "https://github.com/ryuichiueda/py"
+__url__ = "https://github.com/ryuichiueda/opy"
 
 
 def usage():
