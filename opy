@@ -3,7 +3,7 @@ import sys
 import ast
 import re
 
-__version__ = "1.4.1"
+__version__ = "1.4.2"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/py"
@@ -90,10 +90,11 @@ class Parser:
             if arg[-n-1] not in ":;":
                 continue
     
-            if arg[-n:].lstrip(" ")[0] != "{":
+            action = arg[-n:].strip(" ")
+            if action[0] != "{" or action[-1] != "}":
                 continue
-    
-            proc = arg[-n:].rstrip("} ").lstrip(" {")
+
+            proc = action[1:-1].strip(" ")
             if not self.__test(proc):
                 continue
     
