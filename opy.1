@@ -1,0 +1,55 @@
+.TH "OPY" 1 "2019-09-10" "Man Page" "Utility Commands"
+
+.SH NAME
+opy \- onelinerers' Python
+
+.SH SYNOPSIS
+.B opy
+[
+.BI \-m 
+.I modules
+]
+[
+.BI \-i
+.I separators
+|
+.BI \-I
+.I separators
+]
+[
+.BI \-o
+.I separators
+]
+.I 'prog'
+[
+.I file ...
+]
+
+.SH DESCRIPTION
+.PP
+.I Opy
+reads each line of 
+.I file
+and reacts based on the rules written in the 
+.I prog. 
+
+.SH OPTIONS
+.TP
+.B \-m
+.I modules
+import modules 
+.TP
+.B \-i
+.I separators
+change input field separators
+.TP
+.B \-I
+.I separators
+change input field separators with a regular expression
+.TP
+.B \-o
+.I separators
+change output field separators
+
+.SH SEE ALSO
+.BR python3 (1)
