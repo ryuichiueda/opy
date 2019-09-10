@@ -6,10 +6,19 @@
 
 ## install
 
-The `opy` file is copied to `/usr/local/bin/` with the following command.
+### make
+
+The `opy` file and its manual are copied to `/usr/local/bin/` and `/usr/local/share/man/man1/` respectively with the following command.
 
 ```
 $ sudo make install
+```
+
+### homebrew
+
+```
+$ brew tap ryuichiueda/oneliner-python
+$ brew install oneliner-python
 ```
 
 ## usage 
