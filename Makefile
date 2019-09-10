@@ -2,10 +2,10 @@ all:
 	@echo "Please \"make install\" to install"
 
 install:
-	sudo cp ./opy /usr/local/bin/
-	sudo cp ./opy.1 /usr/local/share/man/man1/opy.1
-	sudo /usr/libexec/makewhatis || sudo mandb
+	cp ./opy /usr/local/bin/
+	cp ./opy.1 /usr/local/share/man/man1/opy.1
+	/usr/libexec/makewhatis || mandb
 
 uninstall:
-	sudo rm /usr/local/bin/opy
-	sudo rm /usr/local/share/man/man1/opy.1
+	rm /usr/local/bin/opy
+	rm /usr/local/share/man/man1/opy.1
