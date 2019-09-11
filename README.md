@@ -17,7 +17,7 @@ $ sudo make install
 ### snap (in dogfooding)
 
 ```
-$ sudo snap install --candidate oneliner-python
+$ sudo snap install oneliner-python
 $ sudo snap alias oneliner-python.opy opy
 ```
 
