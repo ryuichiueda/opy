@@ -14,6 +14,13 @@ The `opy` file and its manual are copied to `/usr/local/bin/` and `/usr/local/sh
 $ sudo make install
 ```
 
+### snap (in dogfooding)
+
+```
+$ sudo snap install --candidate oneliner-python
+$ sudo snap alias oneliner-python.opy opy
+```
+
 ### homebrew
 
 ```
