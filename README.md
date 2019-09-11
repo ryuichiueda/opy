@@ -17,8 +17,7 @@ $ sudo make install
 ### snap 
 
 ```
-$ sudo snap install oneliner-python
-$ sudo snap alias oneliner-python.opy opy
+$ sudo snap install opy
 ```
 
 ### homebrew
