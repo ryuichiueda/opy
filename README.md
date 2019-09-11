@@ -26,6 +26,8 @@ For installing the man page, please make a symbolic link as follows.
 $ sudo ln -s /snap/opy/current/opy.1 /usr/share/man/man1/
 ```
 
+* [snapcraft store](https://snapcraft.io/opy)
+
 ### homebrew
 
 ```
