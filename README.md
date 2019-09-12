@@ -214,15 +214,16 @@ a b c
 When a list comprehension is used with an update of a variable, the update is applied AFTER the list comprehension procedure. Please see https://stackoverflow.com/questions/32894942/listcomp-unable-to-access-locals-defined-in-code-called-by-exec-if-nested-in-fun.
 
 ```
-$ seq 3 | opy 'B:{a=0};{a+=F1;globals().update(locals());print(" ".join([ str(x)*a for x in range(3) ]))};E:[a]'
-0 1 2
-000 111 222
-000000 111111 222222
-6
 $ seq 3 | opy 'B:{a=0};{a+=F1;print(" ".join([ str(x)*a for x in range(3) ]))};E:[a]'
   
 0 1 2
 000 111 222
+6
+### how to avold ###
+$ seq 3 | opy 'B:{a=0};{a+=F1;globals().update(locals());print(" ".join([ str(x)*a for x in range(3) ]))};E:[a]'
+0 1 2
+000 111 222
+000000 111111 222222
 6
 ```
 
