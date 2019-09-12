@@ -3,7 +3,7 @@ import sys
 import ast
 import re
 
-__version__ = "1.4.5"
+__version__ = "1.5.0"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
@@ -187,75 +187,6 @@ def print_list(rule, f, glo, loc):
         print_list(rule, f, glo, loc)
 
 
-def main_proc(modules, begins, normals, ends, files, str_mode):
-    global F
-    NF = 0
-    NR = 0
-    FNR = 0
-
-    if modules != "":
-        exec("import " + modules)
-
-    for r in begins:
-        if r.do_exec:
-            exec(r.action)
-        else:
-            print_list(r, F, globals(), locals())
-
-        sys.stdout.flush()
-        globals().update(locals())
-
-    if len(normals) == 0:
-        for r in ends:
-            if r.do_exec:
-                exec(r.action)
-            else:
-                print_list(r, F, globals(), locals())
-    
-            sys.stdout.flush()
-
-        sys.exit(0)
-
-    for filename in files:
-        if filename == "-":
-            h_file = sys.stdin
-        else:
-            h_file = open(filename, "r")
-
-        FILENAME = filename
-        FNR = 0
-
-        for line in h_file:
-            F = split_fields(line, str_mode) 
-            NF = len(F) - 1
-            NR += 1
-            FNR += 1
-
-            for n, e in enumerate(F):
-                locals()["F" + str(n)] = e
-                globals().update(locals())
-
-            for r in normals:
-                if r.pattern != "" and not eval(r.pattern):
-                    continue
-
-                if r.do_exec:
-                    exec(r.action)
-                else:
-                    print_list(r, F, globals(), locals())
-
-                sys.stdout.flush()
-
-        h_file.close()
-
-    for r in ends:
-        if r.do_exec:
-            exec(r.action)
-        else:
-            print_list(r, F, globals(), locals())
-
-        sys.stdout.flush()
-
 
 def set_str_mode():
     if "-s" in sys.argv:
@@ -318,4 +249,69 @@ if __name__ == "__main__":
     OFS = get_ofs()
     files = sys.argv[2:] if len(sys.argv) > 2 else ["-"]
     p = Parser(sys.argv[1])
-    main_proc(modules, p.begins, p.normals, p.ends, files, str_mode)
+
+    ### main procedure (must be executed in the global scope) ###
+    NF = 0
+    NR = 0
+    FNR = 0
+
+    if modules != "":
+        exec("import " + modules)
+
+    for r in p.begins:
+        if r.do_exec:
+            exec(r.action)
+        else:
+            print_list(r, F, globals(), locals())
+
+        sys.stdout.flush()
+
+    if len(p.normals) == 0:
+        for r in p.ends:
+            if r.do_exec:
+                exec(r.action)
+            else:
+                print_list(r, F, globals(), locals())
+    
+            sys.stdout.flush()
+
+        sys.exit(0)
+
+    for filename in files:
+        if filename == "-":
+            h_file = sys.stdin
+        else:
+            h_file = open(filename, "r")
+
+        FILENAME = filename
+        FNR = 0
+
+        for line in h_file:
+            F = split_fields(line, str_mode) 
+            NF = len(F) - 1
+            NR += 1
+            FNR += 1
+
+            for n, e in enumerate(F):
+                globals()["F" + str(n)] = e
+
+            for r in p.normals:
+                if r.pattern != "" and not eval(r.pattern):
+                    continue
+
+                if r.do_exec:
+                    exec(r.action)
+                else:
+                    print_list(r, F, globals(), locals())
+
+                sys.stdout.flush()
+
+        h_file.close()
+
+    for r in p.ends:
+        if r.do_exec:
+            exec(r.action)
+        else:
+            print_list(r, F, globals(), locals())
+
+        sys.stdout.flush()

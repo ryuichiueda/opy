@@ -327,3 +327,9 @@ com=./opy
   result=$( echo 1 | $com '{ print(" ".join([ str(x)*F1 for x in range(3) ])) }' )
   [ "$result" = "0 1 2" ]
 }
+
+@test "scope problem in a closure" {
+  result=$(echo 3 | $com '{a=F1;print(" ".join([ str(x)*a for x in range(3) ]))}' )
+  [ "$result" = "000 111 222" ]
+}
+
