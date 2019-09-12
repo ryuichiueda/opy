@@ -3,7 +3,7 @@ import sys
 import ast
 import re
 
-__version__ = "1.4.4"
+__version__ = "1.4.5"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
@@ -203,6 +203,7 @@ def main_proc(modules, begins, normals, ends, files, str_mode):
             print_list(r, F, globals(), locals())
 
         sys.stdout.flush()
+        globals().update(locals())
 
     if len(normals) == 0:
         for r in ends:
@@ -231,7 +232,8 @@ def main_proc(modules, begins, normals, ends, files, str_mode):
             FNR += 1
 
             for n, e in enumerate(F):
-                exec("F" + str(n) + " = e ")
+                locals()["F" + str(n)] = e
+                globals().update(locals())
 
             for r in normals:
                 if r.pattern != "" and not eval(r.pattern):
