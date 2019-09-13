@@ -7,8 +7,10 @@
 ## example of use
 
 ```
-$ echo 1 2 3 a b c | opy '[ F2, F3*3, F5+"aaa"]'
-2 9 baaa
+$ seq 3 | opy '[math.sin(F1)]'
+0.8414709848078965
+0.9092974268256817
+0.1411200080598672
 ```
 
 * See [EXAMPLES.md](./EXAMPLES.md)
