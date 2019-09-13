@@ -4,6 +4,15 @@
 
 [![Build Status](https://travis-ci.org/ryuichiueda/opy.svg?branch=master)](https://travis-ci.org/ryuichiueda/opy)
 
+## example of use
+
+```
+$ echo 1 2 3 a b c | opy '[ F2, F3*3, F5+"aaa"]'
+2 9 baaa
+```
+
+* See [EXAMPLES.md](./EXAMPLES.md)
+
 ## install
 
 ### make
@@ -34,15 +43,6 @@ $ sudo ln -s /snap/opy/current/opy.1 /usr/share/man/man1/
 $ brew tap ryuichiueda/oneliner-python
 $ brew install oneliner-python
 ```
-
-## usage 
-
-```
-$ echo 1 2 3 a b c | opy '[ F2, F3*3, F5+"aaa"]'
-2 9 baaa
-```
-
-* See [EXAMPLES.md](./EXAMPLES.md)
 
 ## options
 
