@@ -3,7 +3,7 @@ import sys
 import ast
 import re
 
-__version__ = "1.5.1"
+__version__ = "1.5.2"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
@@ -252,75 +252,71 @@ if __name__ == "__main__":
         usage()
         sys.exit(1)
 
-    str_mode = set_str_mode()
-    modules = get_header()
+    __str_mode = set_str_mode()
+    __modules = get_header()
     IFS, IFSREGEX = get_ifs()
     OFS = get_ofs()
-    files = sys.argv[2:] if len(sys.argv) > 2 else ["-"]
-    p = Parser(sys.argv[1])
+    FILES = sys.argv[2:] if len(sys.argv) > 2 else ["-"]
+    __p = Parser(sys.argv[1])
 
     ### main procedure (must be executed in the global scope) ###
     NF = 0
     NR = 0
     FNR = 0
 
-    if modules != "":
-        exec("import " + modules)
+    if __modules != "":
+        exec("import " + __modules)
 
-    for r in p.begins:
-        if r.do_exec:
-            exec(r.action)
+    for __r in __p.begins:
+        if __r.do_exec:
+            exec(__r.action)
         else:
-            print_list(r, F, globals(), locals())
+            print_list(__r, F, globals(), locals())
 
         sys.stdout.flush()
 
-    if len(p.normals) == 0:
-        for r in p.ends:
-            if r.do_exec:
-                exec(r.action)
+    if len(__p.normals) == 0:
+        for __r in __p.ends:
+            if __r.do_exec:
+                exec(__r.action)
             else:
-                print_list(r, F, globals(), locals())
+                print_list(__r, F, globals(), locals())
     
             sys.stdout.flush()
 
         sys.exit(0)
 
-    for filename in files:
-        if filename == "-":
-            h_file = sys.stdin
-        else:
-            h_file = open(filename, "r")
+    for FILENAME in FILES:
+        __h_file = sys.stdin if FILENAME == "-" else open(FILENAME, "r")
 
-        FILENAME = filename
         FNR = 0
 
-        for line in h_file:
-            F = split_fields(line, str_mode) 
+        for line in __h_file:
+            F = split_fields(line, __str_mode) 
             NF = len(F) - 1
             NR += 1
             FNR += 1
 
-            for n, e in enumerate(F):
-                globals()["F" + str(n)] = e
+            for __n, __e in enumerate(F):
+                globals()["F" + str(__n)] = __e
 
-            for r in p.normals:
-                if r.pattern != "" and not eval(r.pattern):
+            for __r in __p.normals:
+                if __r.pattern != "" and not eval(__r.pattern):
                     continue
 
-                if r.do_exec:
-                    exec(r.action)
+                if __r.do_exec:
+                    exec(__r.action)
                 else:
-                    print_list(r, F, globals(), locals())
+                    print_list(__r, F, globals(), locals())
 
                 sys.stdout.flush()
 
-        h_file.close()
+        __h_file.close()
 
-    for r in p.ends:
-        if r.do_exec:
-            exec(r.action)
+    for __r in __p.ends:
+        if __r.do_exec:
+            exec(__r.action)
         else:
-            print_list(r, F, globals(), locals())
+            print_list(__r, F, globals(), locals())
 
         sys.stdout.flush()
