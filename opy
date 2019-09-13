@@ -3,7 +3,7 @@ import sys
 import ast
 import re
 
-__version__ = "1.5.0"
+__version__ = "1.5.1"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
@@ -125,38 +125,8 @@ class Parser:
             return False
 
 
-#################################################
-# data and functions for user
-F = []
-OFS = " "
-IFS = " "
-IFSREGEX = False
-
-def r_(rgx, s=None):
-    if s is None:
-        s = F[0]
-
-    return re.search(rgx, str(s))
-
-
-def n_(s):
-    try:
-        return int(s)
-    except ValueError:
-        try:
-            return float(s)
-        except ValueError:
-            return s
-
-
-def Fs(b, e):
-    return OFS.join( [str(f) for f in F[b:e+1] ])
-
-#################################################
-
-
 def to_numbers(lst):
-    return [n_(e) for e in lst]
+    return [num(e) for e in lst]
 
 
 def split_fields(line, str_mode):
@@ -185,7 +155,6 @@ def print_list(rule, f, glo, loc):
     except NameError as e:
         dynamic_module_import(e)
         print_list(rule, f, glo, loc)
-
 
 
 def set_str_mode():
@@ -236,6 +205,46 @@ def get_ofs():
         sys.argv.remove(ofs)
 
     return ofs
+
+
+#################################################
+# data and functions for user
+F = []
+OFS = " "
+IFS = " "
+IFSREGEX = False
+
+def r_(rgx, s=None):
+    if s is None:
+        s = F[0]
+
+    return re.search(rgx, str(s))
+
+
+def num(s):
+    try:
+        return int(s)
+    except ValueError:
+        try:
+            return float(s)
+        except ValueError:
+            return s
+
+
+def Fs(b, e):
+    return OFS.join( [str(f) for f in F[b:e+1] ])
+
+
+def drop(s, pos):
+    tmp = split_fields(s, True)
+
+    if isinstance(pos, int):
+        tmp.pop(pos)
+    else:
+        for e in reversed(pos):
+            tmp.pop(e)
+
+    return OFS.join([ str(e) for e in tmp[1:] ])
 
 
 if __name__ == "__main__":

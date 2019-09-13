@@ -333,3 +333,8 @@ com=./opy
   [ "$result" = "000 111 222" ]
 }
 
+@test "drop function" {
+  result=$( echo {1..5} | $com '[drop(F0, [2,3])]' )
+  [ "$result" = "1 4 5" ]
+}
+
