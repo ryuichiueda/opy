@@ -3,7 +3,7 @@ import sys
 import ast
 import re
 
-__version__ = "1.5.5"
+__version__ = "1.5.6"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
@@ -87,13 +87,12 @@ class Parser:
         When ";" finds, the right part is tested
         whether it is a Python code or not. 
         '''
-
         n = len(code)
-        while n > 0:
-            n = code[:n].rfind(";")
-            pat = code[n+1:].strip()
-            if self.__test(pat):
-                return Rule(pat, ""), code[:n if n>0 else 0]
+        while n != -1:
+            n = code.rfind(";", 0, n)
+            pattern = code[n+1:].strip()
+            if self.__test(pattern):
+                return Rule(pattern, ""), code[:n if n>0 else 0]
     
         print("pattern parse error", file=sys.stderr)
         sys.exit(1)
@@ -101,56 +100,38 @@ class Parser:
 
     def __list(self, code) -> (Rule, str):
         n = len(code)
-        while n > 0:
-            n = max([ code[:n].rfind(c) for c in ";:" ] )
+        while n != -1:
+            n = max([ code.rfind(c, 0, n) for c in ";:" ] )
             proc = code[n+1:].lstrip()
             if not self.__test(proc):
-                if n == -1:
-                    print("list action parse error", file=sys.stderr)
-                    sys.exit(1)
                 continue
-
-            if n == -1:
-                return Rule("", proc), ""
-            elif code[n] != ":":
-                return Rule("", proc), code[:n]
-
-            try:
+            elif n == -1 or code[n] == ";":
+                return Rule("", proc), code[:n if n>0 else 0]
+            else:
                 s, r = self.__pattern(code[:n])
                 return Rule(s.pattern, code[n+1:]), r
-            except:
-                continue
     
         print("list action parse error", file=sys.stderr)
         sys.exit(1)
 
 
-    def __action(self, arg) -> (Rule, str):
-        for n in range(len(arg)-1):
-            if arg[-n-1] not in ":;":
-                continue
-    
-            action = arg[-n:].strip(" ")
+    def __action(self, code) -> (Rule, str):
+        n = len(code)
+        while n != -1:
+            n = max([ code.rfind(c, 0, n) for c in ";:" ] )
+            action = code[n+1:].strip()
             if action[0] != "{" or action[-1] != "}":
                 continue
 
-            proc = action[1:-1].strip(" ")
+            proc = action[1:-1].strip()
             if not self.__test(proc):
                 continue
-    
-            if arg[-n-1] != ":":
-                return Rule("", proc, True), arg[:-n-1]
-    
-            try:
-                s, r = self.__pattern(arg[:-n-1])
+            elif n == -1 or code[n] != ":":
+                return Rule("", proc, True), code[:n if n>0 else 0]
+            else:
+                s, r = self.__pattern(code[:n])
                 return Rule(s.pattern, proc, True), r
-            except:
-                continue
-    
-        proc = arg.lstrip("{ ").rstrip("} ")
-        if self.__test(proc):
-            return Rule("", proc, True), ""
-    
+
         print("normal action parse error", file=sys.stderr)
         sys.exit(1)
 
@@ -163,21 +144,21 @@ class Parser:
             return False
 
 
-def to_numbers(lst):
+def __to_numbers(lst):
     return [num(e) for e in lst]
 
 
-def split_fields(line, str_mode):
+def __split_fields(line, str_mode):
     line = line.rstrip('\n')
     fs = re.split(IFS, line) if IFSREGEX else line.split(IFS)
 
     if str_mode:
         return [line] + fs
     else:
-        return [line] + to_numbers(fs)
+        return [line] + __to_numbers(fs)
 
 
-def dynamic_module_import(msg):
+def __dynamic_module_import(msg):
     module = re.search(r'\'[^\']+\'', str(msg)).group().strip("'")
     try:
         exec("import " + module, globals())
@@ -186,16 +167,16 @@ def dynamic_module_import(msg):
         sys.exit(1)
 
 
-def print_list(rule, f, glo, loc):
+def __print_list(rule, f, glo, loc):
     try:
         lst = eval(rule.action, glo, loc) if rule.action else f[1:]
         print(OFS.join([str(e) for e in lst]))
     except NameError as e:
-        dynamic_module_import(e)
-        print_list(rule, f, glo, loc)
+        __dynamic_module_import(e)
+        __print_list(rule, f, glo, loc)
 
 
-def set_str_mode():
+def __set_str_mode():
     if "-s" in sys.argv:
         sys.argv.remove("-s")
         return True
@@ -203,7 +184,7 @@ def set_str_mode():
     return False
 
 
-def get_header():
+def __get_header():
     if "-m" in sys.argv:
         pos = sys.argv.index("-m")
         modules = sys.argv[pos+1]
@@ -214,7 +195,7 @@ def get_header():
     return ""
 
 
-def get_ifs():
+def __get_ifs():
     ifs = " "
     regex = False
 
@@ -234,7 +215,7 @@ def get_ifs():
     return ifs, regex
 
 
-def get_ofs():
+def __get_ofs():
     ofs = " "
     if "-o" in sys.argv:
         pos = sys.argv.index("-o")
@@ -274,7 +255,7 @@ def Fs(b, e):
 
 
 def drop(s, pos):
-    tmp = split_fields(s, True)
+    tmp = __split_fields(s, True)
 
     if isinstance(pos, int):
         tmp.pop(pos)
@@ -290,10 +271,10 @@ if __name__ == "__main__":
         usage()
         sys.exit(1)
 
-    __str_mode = set_str_mode()
-    __modules = get_header()
-    IFS, IFSREGEX = get_ifs()
-    OFS = get_ofs()
+    __str_mode = __set_str_mode()
+    __modules = __get_header()
+    IFS, IFSREGEX = __get_ifs()
+    OFS = __get_ofs()
     FILES = sys.argv[2:] if len(sys.argv) > 2 else ["-"]
     __p = Parser(sys.argv[1])
 
@@ -309,7 +290,7 @@ if __name__ == "__main__":
         if __r.has_normal_action:
             exec(__r.action)
         else:
-            print_list(__r, F, globals(), locals())
+            __print_list(__r, F, globals(), locals())
 
         sys.stdout.flush()
 
@@ -318,7 +299,7 @@ if __name__ == "__main__":
             if __r.has_normal_action:
                 exec(__r.action)
             else:
-                print_list(__r, F, globals(), locals())
+                __print_list(__r, F, globals(), locals())
     
             sys.stdout.flush()
 
@@ -330,7 +311,7 @@ if __name__ == "__main__":
         FNR = 0
 
         for line in __h_file:
-            F = split_fields(line, __str_mode) 
+            F = __split_fields(line, __str_mode) 
             NF = len(F) - 1
             NR += 1
             FNR += 1
@@ -345,7 +326,7 @@ if __name__ == "__main__":
                 if __r.has_normal_action:
                     exec(__r.action)
                 else:
-                    print_list(__r, F, globals(), locals())
+                    __print_list(__r, F, globals(), locals())
 
                 sys.stdout.flush()
 
@@ -355,6 +336,6 @@ if __name__ == "__main__":
         if __r.has_normal_action:
             exec(__r.action)
         else:
-            print_list(__r, F, globals(), locals())
+            __print_list(__r, F, globals(), locals())
 
         sys.stdout.flush()
