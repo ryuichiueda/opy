@@ -95,32 +95,33 @@ class Parser:
             if self.__test(pat):
                 return Rule(pat, ""), code[:n if n>0 else 0]
     
-        print("parse error", file=sys.stderr)
+        print("pattern parse error", file=sys.stderr)
         sys.exit(1)
 
 
     def __list(self, code) -> (Rule, str):
-        for n in range(len(code)-1):
-            if code[-n-1] not in ":;":
-                continue
-    
-            proc = code[-n:].lstrip()
+        n = len(code)
+        while n > 0:
+            n = max([ code[:n].rfind(c) for c in ";:" ] )
+            proc = code[n+1:].lstrip()
             if not self.__test(proc):
+                if n == -1:
+                    print("list action parse error", file=sys.stderr)
+                    sys.exit(1)
                 continue
-    
-            if code[-n-1] != ":":
-                return Rule("", proc), code[:-n-1]
-    
+
+            if n == -1:
+                return Rule("", proc), ""
+            elif code[n] != ":":
+                return Rule("", proc), code[:n]
+
             try:
-                s, r = self.__pattern(code[:-n-1])
-                return Rule(s.pattern, code[-n:]), r
+                s, r = self.__pattern(code[:n])
+                return Rule(s.pattern, code[n+1:]), r
             except:
                 continue
     
-        if self.__test(code):
-            return Rule("", code), ""
-    
-        print("parse error", file=sys.stderr)
+        print("list action parse error", file=sys.stderr)
         sys.exit(1)
 
 
@@ -150,7 +151,7 @@ class Parser:
         if self.__test(proc):
             return Rule("", proc, True), ""
     
-        print("parse error", file=sys.stderr)
+        print("normal action parse error", file=sys.stderr)
         sys.exit(1)
 
 
