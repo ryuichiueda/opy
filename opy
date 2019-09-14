@@ -3,7 +3,7 @@ import sys
 import ast
 import re
 
-__version__ = "1.5.6"
+__version__ = "1.5.7"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
@@ -62,11 +62,11 @@ class Parser:
 
     def __get_rule(self, code) -> (Rule, str):
         '''
-        This function judges the type of the rightmost
+        This method judges the type of the rightmost
         rule by the rightmost character. It uses one 
         of three scanners based on the judgement.
         The scanner returns the rightmost rule and
-        the residual code and this function returns them.
+        the residual code and this method returns them.
         '''
 
         code = code.strip()
@@ -83,7 +83,7 @@ class Parser:
 
     def __pattern(self, code) -> (Rule, str):
         '''
-        This function searches ";" from right. 
+        This method searches ";" from right. 
         When ";" finds, the right part is tested
         whether it is a Python code or not. 
         '''
@@ -99,6 +99,13 @@ class Parser:
 
 
     def __list(self, code) -> (Rule, str):
+        '''
+        This method searches a list action from the right.
+        If the rule to which the list action belongs has
+        a pattern, the pattern is also searched and added
+        to the rule. The rule and the left residual string
+        are returned.
+        '''
         n = len(code)
         while n != -1:
             n = max([ code.rfind(c, 0, n) for c in ";:" ] )
@@ -107,7 +114,7 @@ class Parser:
                 continue
             elif n == -1 or code[n] == ";":
                 return Rule("", proc), code[:n if n>0 else 0]
-            else:
+            elif code[n] == ":":
                 s, r = self.__pattern(code[:n])
                 return Rule(s.pattern, code[n+1:]), r
     
@@ -116,6 +123,10 @@ class Parser:
 
 
     def __action(self, code) -> (Rule, str):
+        '''
+        This method searches a normal action from the right.
+        Its procedure is almost the same with that of __list.
+        '''
         n = len(code)
         while n != -1:
             n = max([ code.rfind(c, 0, n) for c in ";:" ] )
@@ -128,7 +139,7 @@ class Parser:
                 continue
             elif n == -1 or code[n] != ":":
                 return Rule("", proc, True), code[:n if n>0 else 0]
-            else:
+            elif code[n] == ":":
                 s, r = self.__pattern(code[:n])
                 return Rule(s.pattern, proc, True), r
 
@@ -137,6 +148,11 @@ class Parser:
 
 
     def __test(self, code) -> bool:
+        '''
+        This method tests whether the code is
+        appropriate as a sentence or an expression
+        of Python.
+        '''
         try:
             ast.parse(code)
             return True
