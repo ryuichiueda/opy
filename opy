@@ -3,7 +3,7 @@ import sys
 import ast
 import re
 
-__version__ = "1.5.2"
+__version__ = "1.5.3"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
@@ -14,80 +14,114 @@ def usage():
     print("Copyright 2019 " + __author__, file=sys.stderr)
     print("Released under " + __license__, file=sys.stderr)
     print(__url__, file=sys.stderr)
-    print("\nYou are using Python {}.{}.{} with this command.".format(*sys.version_info[0:3]),
+    print("\nYou are using Python {}.{}.{} with this command."
+          .format(*sys.version_info[0:3]),
           file=sys.stderr)
 
 
 class Rule:
-    def __init__(self, pattern, action, do_exec=False):
+    '''
+    Opy recognizes and executes a set of rules. The
+    instance of this class contains information of a
+    rule. 
+    A rule is composed of either or both of a pattern
+    and an action. In patterns and actions, sentences
+    or expressions of Python are written. 
+    An action is either a normal action or a list
+    action. 
+    '''
+    def __init__(self, pattern, action, has_normal=False):
         self.pattern = pattern
         self.action = action
-        self.do_exec = do_exec
+        self.has_normal_action = has_normal
 
 
 class Parser:
-    def __init__(self, arg):
+    '''
+    When a code is given, the instance of this class
+    parses the code immediately. Then it sorts rules
+    by patterns. 
+    When the pattern of a rule is B/BEGIN or E/END, 
+    the rule is categorized to "begins" or "ends"
+    respectively. Otherwise it is appended to "lines."
+    '''
+    def __init__(self, code):
         rules = []
-        while arg != "":
-            rule, arg = self.__get_rule(arg)
-            if rule != "":
-                rules.insert(0, rule)
+        while True:
+            rule, code = self.__get_rule(code)
+            if not rule:
+                break
+
+            # The parser gives each rule in the inverse order.
+            rules.insert(0, rule) 
 
         self.begins = [r for r in rules if r.pattern in ["B", "BEGIN"] ]
         self.ends = [r for r in rules if r.pattern in ["E","END"] ]
-        self.normals = [r for r in rules if r not in self.begins + self.ends ]
+        self.lines = [r for r in rules if r not in self.begins + self.ends ]
 
 
-    def __get_rule(self, arg):
-        arg = arg.strip()
-        if arg == "":
-            return "", ""
-        elif arg[-1] == "]":
-            return self.__list(arg)
-        elif arg[-1] == "}":
-            return self.__action(arg)
-        else:
-            return self.__pattern(arg)
+    def __get_rule(self, code) -> (Rule, str):
+        '''
+        This function judges the type of the rightmost
+        rule by the rightmost character. It uses one 
+        of three scanners based on the judgement.
+        The scanner returns the rightmost rule and
+        the residual code and this function returns them.
+        '''
+
+        code = code.strip()
+
+        if code == "":
+            return None, ""
+        elif code[-1] == "]": # The rule has an list action.
+            return self.__list(code)
+        elif code[-1] == "}": # It has an normal action.
+            return self.__action(code)
+        else:                 # It has no action. 
+            return self.__pattern(code)
 
 
-    def __pattern(self, arg):
-        for n in range(len(arg)):
-            if arg[-n-1] != ";":
+    def __pattern(self, code) -> (Rule, str):
+        '''
+        This function scans the code reversely. 
+        '''
+        for n in range(len(code)):
+            if code[-n-1] != ";":
                 continue
     
-            pat = arg[-n:].strip()
+            pat = code[-n:].strip()
             if self.__test(pat):
-                return Rule(pat, ""), arg[:-n-1]
+                return Rule(pat, ""), code[:-n-1]
     
-        return Rule(arg, ""), ""
+        return Rule(code, ""), ""
 
 
-    def __list(self, arg):
-        for n in range(len(arg)-1):
-            if arg[-n-1] not in ":;":
+    def __list(self, code) -> (Rule, str):
+        for n in range(len(code)-1):
+            if code[-n-1] not in ":;":
                 continue
     
-            proc = arg[-n:].lstrip()
+            proc = code[-n:].lstrip()
             if not self.__test(proc):
                 continue
     
-            if arg[-n-1] != ":":
-                return Rule("", proc), arg[:-n-1]
+            if code[-n-1] != ":":
+                return Rule("", proc), code[:-n-1]
     
             try:
-                s, r = self.__pattern(arg[:-n-1])
-                return Rule(s.pattern, arg[-n:]), r
+                s, r = self.__pattern(code[:-n-1])
+                return Rule(s.pattern, code[-n:]), r
             except:
                 continue
     
-        if self.__test(arg):
-            return Rule("", arg), ""
+        if self.__test(code):
+            return Rule("", code), ""
     
         print("parse error", file=sys.stderr)
         sys.exit(1)
 
 
-    def __action(self, arg):
+    def __action(self, arg) -> (Rule, str):
         for n in range(len(arg)-1):
             if arg[-n-1] not in ":;":
                 continue
@@ -117,7 +151,7 @@ class Parser:
         sys.exit(1)
 
 
-    def __test(self, code):
+    def __test(self, code) -> bool:
         try:
             ast.parse(code)
             return True
@@ -268,16 +302,16 @@ if __name__ == "__main__":
         exec("import " + __modules)
 
     for __r in __p.begins:
-        if __r.do_exec:
+        if __r.has_normal_action:
             exec(__r.action)
         else:
             print_list(__r, F, globals(), locals())
 
         sys.stdout.flush()
 
-    if len(__p.normals) == 0:
+    if len(__p.lines) == 0:
         for __r in __p.ends:
-            if __r.do_exec:
+            if __r.has_normal_action:
                 exec(__r.action)
             else:
                 print_list(__r, F, globals(), locals())
@@ -300,11 +334,11 @@ if __name__ == "__main__":
             for __n, __e in enumerate(F):
                 globals()["F" + str(__n)] = __e
 
-            for __r in __p.normals:
+            for __r in __p.lines:
                 if __r.pattern != "" and not eval(__r.pattern):
                     continue
 
-                if __r.do_exec:
+                if __r.has_normal_action:
                     exec(__r.action)
                 else:
                     print_list(__r, F, globals(), locals())
@@ -314,7 +348,7 @@ if __name__ == "__main__":
         __h_file.close()
 
     for __r in __p.ends:
-        if __r.do_exec:
+        if __r.has_normal_action:
             exec(__r.action)
         else:
             print_list(__r, F, globals(), locals())
