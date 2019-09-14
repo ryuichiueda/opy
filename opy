@@ -3,7 +3,7 @@ import sys
 import ast
 import re
 
-__version__ = "1.5.3"
+__version__ = "1.5.4"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
@@ -83,17 +83,20 @@ class Parser:
 
     def __pattern(self, code) -> (Rule, str):
         '''
-        This function scans the code reversely. 
+        This function searches ";" from right. 
+        When ";" finds, the right part is tested
+        whether it is a Python code or not. 
         '''
-        for n in range(len(code)):
-            if code[-n-1] != ";":
-                continue
-    
-            pat = code[-n:].strip()
+
+        n = len(code)
+        while n > 0:
+            n = code[:n].rfind(";")
+            pat = code[n+1:].strip()
             if self.__test(pat):
-                return Rule(pat, ""), code[:-n-1]
+                return Rule(pat, ""), code[:n if n>0 else 0]
     
-        return Rule(code, ""), ""
+        print("parse error", file=sys.stderr)
+        sys.exit(1)
 
 
     def __list(self, code) -> (Rule, str):
