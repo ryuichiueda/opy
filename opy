@@ -3,7 +3,7 @@ import sys
 import ast
 import re
 
-__version__ = "1.5.4"
+__version__ = "1.5.5"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
