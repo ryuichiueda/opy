@@ -3,7 +3,7 @@ import sys
 import ast
 import re
 
-__version__ = "1.5.7"
+__version__ = "1.5.8"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
@@ -160,21 +160,24 @@ class Parser:
             return False
 
 
-def __to_numbers(lst):
-    return [num(e) for e in lst]
-
-
 def __split_fields(line, str_mode):
+    '''
+    This function splits a line into a list by using the characters
+    in IFS (input field separator), and return the list. If the
+    -s option is not given, this function tries to convert each element
+    into an int or float value. At the return of the list, 
+    the line before split is added to the list as the zeroth element.
+    '''
     line = line.rstrip('\n')
     fs = re.split(IFS, line) if IFSREGEX else line.split(IFS)
-
-    if str_mode:
-        return [line] + fs
-    else:
-        return [line] + __to_numbers(fs)
+    return [line] + (fs if str_mode else [num(e) for e in fs])
 
 
 def __dynamic_module_import(msg):
+    '''
+    This function tries to import a package with the name extracted
+    from a given NameError message. 
+    '''
     module = re.search(r'\'[^\']+\'', str(msg)).group().strip("'")
     try:
         exec("import " + module, globals())
@@ -184,6 +187,11 @@ def __dynamic_module_import(msg):
 
 
 def __print_list(rule, f, glo, loc):
+    '''
+    This function outputs the list with the delimiter given in OFS.
+    At a name error, it calls __dynamic_module_import so as to import
+    a module with the name. If successful, it retries the output again.
+    '''
     try:
         lst = eval(rule.action, glo, loc) if rule.action else f[1:]
         print(OFS.join([str(e) for e in lst]))
@@ -191,6 +199,13 @@ def __print_list(rule, f, glo, loc):
         __dynamic_module_import(e)
         __print_list(rule, f, glo, loc)
 
+
+'''
+The following __set... functions search options. 
+When an option is found. They set or return appropriate
+data for reflecting the option. They also removes
+the option and its associated arguments. 
+'''
 
 def __set_str_mode():
     if "-s" in sys.argv:
@@ -242,8 +257,11 @@ def __get_ofs():
     return ofs
 
 
-#################################################
-# data and functions for user
+'''
+Following variables and functions before
+the main part are for users. 
+'''
+
 F = []
 OFS = " "
 IFS = " "
@@ -280,6 +298,13 @@ def drop(s, pos):
             tmp.pop(e)
 
     return OFS.join([ str(e) for e in tmp[1:] ])
+
+
+'''
+The following are the main part. To assure the consistency
+of scopes of variables, I didn't divide processes into
+functions. However, please tell me it if you have an idea.  
+'''
 
 
 if __name__ == "__main__":
