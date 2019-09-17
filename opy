@@ -4,7 +4,7 @@ import ast
 import re
 import codecs
 
-__version__ = "1.5.11"
+__version__ = "1.6.0"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
@@ -285,11 +285,11 @@ def num(s):
             return s
 
 
-def Fs(b, e):
-    return OFS.join( [str(f) for f in F[b:e+1] ])
+def join(b, e, fs):
+    return OFS.join( [str(f) for f in fs[b:e+1] ])
 
 
-def drop(s, pos):
+def drop(pos, s):
     tmp = __split_fields(s, True)
 
     if isinstance(pos, int):
@@ -306,7 +306,6 @@ The following are the main part. To assure the consistency
 of scopes of variables, I didn't divide processes into
 functions. However, please tell me it if you have an idea.  
 '''
-
 
 if __name__ == "__main__":
     if len(sys.argv) < 2 or sys.argv[1] == "--help":

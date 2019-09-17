@@ -149,18 +149,18 @@ com=./opy
 }
 
 @test "join shortcut" {
-  result=$( echo {1..10} | $com '[Fs(2,4)]' )
+  result=$( echo {1..10} | $com '[join(2,4,F)]' )
   [ "$result" = "2 3 4" ]
 }
 
 @test "field separator" {
-  result=$( echo {1..10} | tr ' ' , | $com -i , -o @ '[Fs(2,4)]' )
+  result=$( echo {1..10} | tr ' ' , | $com -i , -o @ '[join(2,4,F)]' )
   [ "$result" = "2@3@4" ]
 }
 
 
 @test "regex input separator" {
-  result=$( echo a33b313c | tr ' ' , | $com -I '\d+' '[Fs(1,3)]' )
+  result=$( echo a33b313c | tr ' ' , | $com -I '\d+' '[join(1,3,F)]' )
   [ "$result" = "a b c" ]
 }
 
@@ -303,18 +303,18 @@ com=./opy
 }
 
 @test "join shortcut" {
-  result=$( echo {1..10} | $com '[Fs(2,4)]' )
+  result=$( echo {1..10} | $com '[join(2,4,F)]' )
   [ "$result" = "2 3 4" ]
 }
 
 @test "field separator" {
-  result=$( echo {1..10} | tr ' ' , | $com -i , -o @ '[Fs(2,4)]' )
+  result=$( echo {1..10} | tr ' ' , | $com -i , -o @ '[join(2,4,F)]' )
   [ "$result" = "2@3@4" ]
 }
 
 
 @test "regex input separator" {
-  result=$( echo a33b313c | tr ' ' , | $com -I '\d+' '[Fs(1,3)]' )
+  result=$( echo a33b313c | tr ' ' , | $com -I '\d+' '[join(1,3,F)]' )
   [ "$result" = "a b c" ]
 }
 
@@ -334,7 +334,7 @@ com=./opy
 }
 
 @test "drop function" {
-  result=$( echo {1..5} | $com '[drop(F0, [2,3])]' )
+  result=$( echo {1..5} | $com '[drop([2,3], F0)]' )
   [ "$result" = "1 4 5" ]
 }
 
