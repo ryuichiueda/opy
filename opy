@@ -4,7 +4,7 @@ import ast
 import re
 import codecs
 
-__version__ = "1.7.0"
+__version__ = "1.7.1"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
@@ -216,6 +216,14 @@ def __set_str_mode():
     return False
 
 
+def __set_buffer_mode():
+    if "-b" in sys.argv:
+        sys.argv.remove("-b")
+        return True
+     
+    return False
+
+
 def __get_header():
     if "-m" in sys.argv:
         pos = sys.argv.index("-m")
@@ -315,6 +323,7 @@ if __name__ == "__main__":
     for users. 
     '''
     __str_mode = __set_str_mode()
+    __buffer_mode = __set_buffer_mode()
     __modules = __get_header()
     IFS, IFSREGEX = __get_ifs()
     OFS = __get_ofs()
@@ -350,7 +359,8 @@ if __name__ == "__main__":
         else:
             __print_list(__r, F, globals(), locals())
 
-        sys.stdout.flush()
+        if not __buffer_mode:
+            sys.stdout.flush()
 
     for FILENAME in FILES:
         __h_file = sys.stdin if FILENAME == "-" else open(FILENAME, "r")
@@ -381,7 +391,8 @@ if __name__ == "__main__":
                 else:
                     __print_list(__r, F, globals(), locals())
 
-                sys.stdout.flush()
+                if not __buffer_mode:
+                    sys.stdout.flush()
 
         __h_file.close()
 
@@ -392,4 +403,5 @@ if __name__ == "__main__":
         else:
             __print_list(__r, F, globals(), locals())
 
-        sys.stdout.flush()
+        if not __buffer_mode:
+            sys.stdout.flush()
