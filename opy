@@ -4,7 +4,7 @@ import ast
 import re
 import codecs
 
-__version__ = "1.7.2"
+__version__ = "1.8.0"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
@@ -285,15 +285,20 @@ def num(s):
             return s
 
 
-def join(fs, b, e):
-    return OFS.join( [str(f) for f in fs[b:e+1] ])
+def join(fs, pos=None):
+    if pos == None:
+        return OFS.join( [str(f) for f in fs] )
+
+    outindex = [pos] if isinstance(pos, int) else pos
+    outlist = fs if isinstance(fs, list) else __split_fields(fs, True)
+    return OFS.join( [str(outlist[p]) for p in outindex ] )
 
 
 def dropjoin(fs, pos):
     pos = [pos] if isinstance(pos, int) else pos
     outindex = list( set(range(1, NF+1)).difference(pos) )
     outlist = fs if isinstance(fs, list) else __split_fields(fs, True)
-    return OFS.join([ str(outlist[e]) for e in outindex ])
+    return OFS.join( [ str(outlist[e]) for e in outindex ] )
 
 
 '''
