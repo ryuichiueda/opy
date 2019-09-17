@@ -2,8 +2,9 @@
 import sys
 import ast
 import re
+import codecs
 
-__version__ = "1.5.8"
+__version__ = "1.5.9"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
@@ -312,18 +313,35 @@ if __name__ == "__main__":
         usage()
         sys.exit(1)
 
+    '''
+    The following lines extract information from options.
+    Some names of variables have prefix "__" so as not to
+    collide with the names that users define. 
+    The names with upper case latters are predefined variables
+    for users. 
+    '''
     __str_mode = __set_str_mode()
     __modules = __get_header()
     IFS, IFSREGEX = __get_ifs()
     OFS = __get_ofs()
     FILES = sys.argv[2:] if len(sys.argv) > 2 else ["-"]
-    __p = Parser(sys.argv[1])
 
-    ### main procedure (must be executed in the global scope) ###
+    '''
+    The following line parses the code. If the code is composed
+    of only begin/end patterns, the standard input is removed 
+    from the file list. Otherwise, the procedure stops when data
+    is not given from it.
+    '''
+    __p = Parser(sys.argv[1])
+    if __p.lines == []:
+        FILES.remove("-")
+
+    # Here the main process starts. 
     NF = 0
     NR = 0
     FNR = 0
 
+    # The modules after -m option are imported here. 
     if __modules != "":
         exec("import " + __modules)
 
@@ -335,17 +353,6 @@ if __name__ == "__main__":
 
         sys.stdout.flush()
 
-    if len(__p.lines) == 0:
-        for __r in __p.ends:
-            if __r.has_normal_action:
-                exec(__r.action)
-            else:
-                __print_list(__r, F, globals(), locals())
-    
-            sys.stdout.flush()
-
-        sys.exit(0)
-
     for FILENAME in FILES:
         __h_file = sys.stdin if FILENAME == "-" else open(FILENAME, "r")
 
@@ -353,6 +360,7 @@ if __name__ == "__main__":
 
         for line in __h_file:
             F = __split_fields(line, __str_mode) 
+
             NF = len(F) - 1
             NR += 1
             FNR += 1
