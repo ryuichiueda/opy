@@ -4,7 +4,7 @@ import ast
 import re
 import codecs
 
-__version__ = "1.7.1"
+__version__ = "1.7.2"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
@@ -202,23 +202,15 @@ def __print_list(rule, f, glo, loc):
 
 
 '''
-The following __set... functions search options. 
+The following __check... or __get... functions search options. 
 When an option is found. They set or return appropriate
 data for reflecting the option. They also removes
 the option and its associated arguments. 
 '''
 
-def __set_str_mode():
-    if "-s" in sys.argv:
-        sys.argv.remove("-s")
-        return True
-     
-    return False
-
-
-def __set_buffer_mode():
-    if "-b" in sys.argv:
-        sys.argv.remove("-b")
+def __check_option(opt):
+    if opt in sys.argv:
+        sys.argv.remove(opt)
         return True
      
     return False
@@ -322,8 +314,8 @@ if __name__ == "__main__":
     The names with upper case latters are predefined variables
     for users. 
     '''
-    __str_mode = __set_str_mode()
-    __buffer_mode = __set_buffer_mode()
+    __str_mode = __check_option("-s")
+    __buffer_mode = __check_option("-b")
     __modules = __get_header()
     IFS, IFSREGEX = __get_ifs()
     OFS = __get_ofs()
