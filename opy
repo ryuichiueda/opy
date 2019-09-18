@@ -4,7 +4,7 @@ import ast
 import re
 import codecs
 
-__version__ = "1.8.1"
+__version__ = "1.8.2"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
@@ -359,45 +359,50 @@ if __name__ == "__main__":
         if not __buffer_mode:
             sys.stdout.flush()
 
-    for FILENAME in FILES:
-        __h_file = sys.stdin if FILENAME == "-" else open(FILENAME, "r")
-        FNR = 0 # raw number in each file
+    try:
+        for FILENAME in FILES:
+            __h_file = sys.stdin if FILENAME == "-" else open(FILENAME, "r")
+            FNR = 0 # raw number in each file
+    
+            for F0 in __h_file:
+                F = __split_fields(F0, __str_mode) 
+    
+                NF = len(F) - 1
+                NR += 1
+                FNR += 1
+    
+                '''
+                Each element in F is copied to Fn (F0, F1, ...) variable.
+                Binded elements to Fn variables are not references but
+                duplications. Though it may rise to the confusion, now it
+                is not dealt with. 
+                '''
+                globals().update( {"F"+str(n): F[n] for n in range(1,NF+1)} )
+    
+                for __r in __p.lines:
+                    if __r.pattern != "" and not eval(__r.pattern):
+                        continue
+    
+                    if __r.has_normal_action:
+                        exec(__r.action)
+                    else:
+                        __print_list(__r, F, globals(), locals())
+    
+                    if not __buffer_mode:
+                        sys.stdout.flush()
+    
+            __h_file.close()
+    
+        # This loop executes end rules one by one.
+        for __r in __p.ends:
+            if __r.has_normal_action:
+                exec(__r.action)
+            else:
+                __print_list(__r, F, globals(), locals())
+    
+            if not __buffer_mode:
+                sys.stdout.flush()
 
-        for F0 in __h_file:
-            F = __split_fields(F0, __str_mode) 
-
-            NF = len(F) - 1
-            NR += 1
-            FNR += 1
-
-            '''
-            Each element in F is copied to Fn (F0, F1, ...) variable.
-            Binded elements to Fn variables are not references but
-            duplications. Though it may rise to the confusion, now it
-            is not dealt with. 
-            '''
-            globals().update( {"F"+str(n): F[n] for n in range(1,NF+1)} )
-
-            for __r in __p.lines:
-                if __r.pattern != "" and not eval(__r.pattern):
-                    continue
-
-                if __r.has_normal_action:
-                    exec(__r.action)
-                else:
-                    __print_list(__r, F, globals(), locals())
-
-                if not __buffer_mode:
-                    sys.stdout.flush()
-
-        __h_file.close()
-
-    # This loop executes end rules one by one.
-    for __r in __p.ends:
-        if __r.has_normal_action:
-            exec(__r.action)
-        else:
-            __print_list(__r, F, globals(), locals())
-
-        if not __buffer_mode:
-            sys.stdout.flush()
+    # Opy ignores PIPEFAIL. 
+    except BrokenPipeError:
+        sys.exit(0)
