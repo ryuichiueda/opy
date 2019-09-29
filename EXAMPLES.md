@@ -158,6 +158,21 @@ $ opy 'NR==1' $(which opy)
 #!/usr/bin/env python3
 ```
 
+### default dictionary/list
+
+```
+echo 'a 3
+b 4
+a 5 
+b 2.3' | opy '{D[F1]+=F2};E:{for k in D: print(k, D[k])}'
+a 8
+b 6.3
+```
+
+```
+$ seq 10 | opy 'NR%2:{L.append(F1)};E:[L]'
+[1, 3, 5, 7, 9]
+```
 
 ## options
 
