@@ -4,7 +4,7 @@ import ast
 import re
 import codecs
 
-__version__ = "1.8.2"
+__version__ = "1.9.0"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
@@ -340,6 +340,8 @@ if __name__ == "__main__":
     NF = 0
     NR = 0
     FNR = 0
+    D = {}   #general purpose distionary
+    L = []   #general purpose list
 
     # The modules after -m option are imported here. 
     if __modules != "":
