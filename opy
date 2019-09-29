@@ -5,7 +5,7 @@ import re
 import codecs
 from collections import defaultdict
 
-__version__ = "1.9.1"
+__version__ = "1.9.2"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
@@ -300,6 +300,16 @@ def dropjoin(fs, pos):
     outindex = list( set(range(1, NF+1)).difference(pos) )
     outlist = fs if isinstance(fs, list) else __split_fields(fs, True)
     return OFS.join( [ str(outlist[e]) for e in outindex ] )
+
+
+def p_(var, end=None):
+    if isinstance(var, list):
+        print(OFS.join( [str(f) for f in var] ), end=end)
+    elif isinstance(var, dict):
+        for k in var:
+            print(OFS.join([str(k), str(var[k])]), end=end)
+    else:
+        print(var, end=end)
 
 
 '''
