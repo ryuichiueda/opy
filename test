@@ -353,7 +353,7 @@ com=./opy
 }
 
 @test "general purpose dictionary" {
-  result=$( seq 3 | $com '{D[NR]="a"*F1};E:[D]' )
+  result=$( seq 3 | $com '{D[NR]="a"*F1};E:[dict(D)]' )
   [ "$result" = "{1: 'a', 2: 'aa', 3: 'aaa'}" ] 
 }
 

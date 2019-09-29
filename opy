@@ -3,8 +3,9 @@ import sys
 import ast
 import re
 import codecs
+from collections import defaultdict
 
-__version__ = "1.9.0"
+__version__ = "1.9.1"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
@@ -340,8 +341,8 @@ if __name__ == "__main__":
     NF = 0
     NR = 0
     FNR = 0
-    D = {}   #general purpose distionary
-    L = []   #general purpose list
+    D = defaultdict(int)   #general purpose distionary
+    L = []                 #general purpose list
 
     # The modules after -m option are imported here. 
     if __modules != "":
