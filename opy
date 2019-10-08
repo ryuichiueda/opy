@@ -5,7 +5,7 @@ import re
 import codecs
 from collections import defaultdict
 
-__version__ = "1.9.2"
+__version__ = "1.9.3"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
@@ -378,6 +378,7 @@ if __name__ == "__main__":
             FNR = 0 # raw number in each file
     
             for F0 in __h_file:
+                F0 = F0.rstrip()
                 F = __split_fields(F0, __str_mode) 
     
                 NF = len(F) - 1
