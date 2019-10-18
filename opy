@@ -5,7 +5,7 @@ import re
 import codecs
 from collections import defaultdict
 
-__version__ = "2.0.0"
+__version__ = "2.0.1"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
@@ -162,17 +162,29 @@ class Parser:
             return False
 
 
-def __split_fields(line, str_mode):
+def __split_fields_normal(line):
     '''
     This function splits a line into a list by using the characters
-    in IFS (input field separator), and return the list. If the
-    -s option is not given, this function tries to convert each element
-    into an int or float value. At the return of the list, 
-    the line before split is added to the list as the zeroth element.
+    in IFS (input field separator), and return the list. This function
+    tries to convert each element into an int or float value. At the 
+    return of the list, the line before split is added to the list as
+    the zeroth element.
     '''
     line = line.rstrip('\n')
     fs = re.split(IFS, line) if IFSREGEX else line.split(IFS)
-    return [line] + (fs if str_mode else [num(e) for e in fs])
+    return [line] + [num(e) for e in fs]
+
+
+def __split_fields_strmode(line):
+    '''
+    This function splits a line into a list by using the characters
+    in IFS (input field separator), and return the list. At the 
+    return of the list, the line before split is added to the list 
+    as the zeroth element.
+    '''
+    line = line.rstrip('\n')
+    fs = re.split(IFS, line) if IFSREGEX else line.split(IFS)
+    return [line] + fs
 
 
 def __dynamic_module_import(msg):
@@ -293,14 +305,14 @@ def join(fs, pos=None):
         return OFS.join( [str(f) for f in fs] )
 
     outindex = [pos] if isinstance(pos, int) else pos
-    outlist = fs if isinstance(fs, list) else __split_fields(fs, True)
+    outlist = fs if isinstance(fs, list) else __split_fields(fs)
     return OFS.join( [str(outlist[p]) for p in outindex ] )
 
 
 def dropjoin(fs, pos):
     pos = [pos] if isinstance(pos, int) else pos
     outindex = list( set(range(1, NF+1)).difference(pos) )
-    outlist = fs if isinstance(fs, list) else __split_fields(fs, True)
+    outlist = fs if isinstance(fs, list) else __split_fields(fs)
     return OFS.join( [ str(outlist[e]) for e in outindex ] )
 
 
@@ -332,7 +344,8 @@ if __name__ == "__main__":
     The names with upper case latters are predefined variables
     for users. 
     '''
-    __str_mode = __check_option("-s")
+    __split_fields = __split_fields_strmode if __check_option("-s") \
+                                            else __split_fields_normal
     __buffer_mode = __check_option("-b")
     __modules = __get_header()
     IFS, IFSREGEX = __get_ifs()
@@ -381,7 +394,7 @@ if __name__ == "__main__":
     
             for F0 in __h_file:
                 F0 = F0.rstrip()
-                F = __split_fields(F0, __str_mode) 
+                F = __split_fields(F0)
     
                 NF = len(F) - 1
                 NR += 1
