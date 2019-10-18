@@ -5,7 +5,7 @@ import re
 import codecs
 from collections import defaultdict
 
-__version__ = "1.9.3"
+__version__ = "2.0.0"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
@@ -278,12 +278,14 @@ def r_(rgx, s=None):
 
 def num(s):
     try:
-        return int(s)
+        return int(s, 0)
     except ValueError:
-        try:
-            return float(s)
-        except ValueError:
-            return s
+        pass
+
+    try:
+        return float(s)
+    except ValueError:
+        return s
 
 
 def join(fs, pos=None):
@@ -398,7 +400,7 @@ if __name__ == "__main__":
                         continue
     
                     if __r.has_normal_action:
-                        exec(__r.action)
+                       exec(__r.action)
                     else:
                         __print_list(__r, F, globals(), locals())
     

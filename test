@@ -371,3 +371,8 @@ com=./opy
   result=$( seq 3 | $com  -o @ '{L.append(F1)};E:{p_(L)}' )
   [ "$result" = "1@2@3" ] 
 }
+
+@test "parse hex and others" {
+  result=$( echo 0xa0 0b11 -0o11 | $com '[*F[1:]]' )
+  [ "$result" = "160 3 -9" ] 
+}
