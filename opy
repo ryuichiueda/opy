@@ -5,7 +5,7 @@ import re
 import codecs
 from collections import defaultdict
 
-__version__ = "2.0.1"
+__version__ = "2.1.1"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
@@ -239,6 +239,17 @@ def __get_header():
 
     return ""
 
+def __get_values():
+    equations = []
+    while "-v" in sys.argv:
+        pos = sys.argv.index("-v")
+        equation = sys.argv[pos+1]
+        sys.argv.remove("-v")
+        sys.argv.remove(equation)
+        equations.append(equation)
+
+    return equations
+
 
 def __get_ifs():
     ifs = " "
@@ -348,6 +359,10 @@ if __name__ == "__main__":
                                             else __split_fields_normal
     __buffer_mode = __check_option("-b")
     __modules = __get_header()
+    for eq in __get_values():
+        token = eq.split("=")
+        locals()[token[0]] = num(token[1])
+
     IFS, IFSREGEX = __get_ifs()
     OFS = __get_ofs()
     FILES = sys.argv[2:] if len(sys.argv) > 2 else ["-"]

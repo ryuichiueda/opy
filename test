@@ -376,3 +376,8 @@ com=./opy
   result=$( echo 0xa0 0b11 -0o11 | $com '[*F[1:]]' )
   [ "$result" = "160 3 -9" ] 
 }
+
+@test "outer values" {
+  result=$( a=3.14; b="aho aho" ; $com -v "x=$a" -v "y=$b" 'B:[x*2, y*2]' )
+  [ "$result" = "6.28 aho ahoaho aho" ] 
+}
