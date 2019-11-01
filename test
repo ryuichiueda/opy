@@ -381,3 +381,8 @@ com=./opy
   result=$( a=3.14; b="aho aho" ; $com -v "x=$a" -v "y=$b" 'B:[x*2, y*2]' )
   [ "$result" = "6.28 aho ahoaho aho" ] 
 }
+
+@test "outer values on string mode" {
+  result=$( a=3.14; b="aho aho" ; $com -s -v "x=$a" -v "y=$b" 'B:[x*2, y*2]' )
+  [ "$result" = "3.143.14 aho ahoaho aho" ] 
+}

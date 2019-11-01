@@ -5,7 +5,7 @@ import re
 import codecs
 from collections import defaultdict
 
-__version__ = "2.1.1"
+__version__ = "2.1.2"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
@@ -355,13 +355,14 @@ if __name__ == "__main__":
     The names with upper case latters are predefined variables
     for users. 
     '''
-    __split_fields = __split_fields_strmode if __check_option("-s") \
+    __str_mode = __check_option("-s")
+    __split_fields = __split_fields_strmode if __str_mode \
                                             else __split_fields_normal
     __buffer_mode = __check_option("-b")
     __modules = __get_header()
     for eq in __get_values():
         token = eq.split("=")
-        locals()[token[0]] = num(token[1])
+        locals()[token[0]] = token[1] if __str_mode else num(token[1])
 
     IFS, IFSREGEX = __get_ifs()
     OFS = __get_ofs()
