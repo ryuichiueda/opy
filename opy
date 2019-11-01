@@ -5,7 +5,7 @@ import re
 import codecs
 from collections import defaultdict
 
-__version__ = "2.1.2"
+__version__ = "2.1.3"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
@@ -187,6 +187,20 @@ def __split_fields_strmode(line):
     return [line] + fs
 
 
+def __split_fields_null(line):
+    '''
+    __split_fields when the IFS is a null string.
+    '''
+    return [line] + [num(e) for e in line.rstrip('\n') ] 
+
+
+def __split_fields_strmode_null(line):
+    '''
+    __split_fields when the IFS is a null string.
+    '''
+    return [line] + [c for c in line.rstrip('\n') ]
+
+
 def __dynamic_module_import(msg):
     '''
     This function tries to import a package with the name extracted
@@ -348,6 +362,8 @@ if __name__ == "__main__":
         usage()
         sys.exit(1)
 
+    IFS, IFSREGEX = __get_ifs()
+
     '''
     The following lines extract information from options.
     Some names of variables have prefix "__" so as not to
@@ -356,15 +372,21 @@ if __name__ == "__main__":
     for users. 
     '''
     __str_mode = __check_option("-s")
-    __split_fields = __split_fields_strmode if __str_mode \
-                                            else __split_fields_normal
+    if __str_mode and IFS != "":
+        __split_fields = __split_fields_strmode
+    elif IFS != "":
+        __split_fields = __split_fields_normal
+    elif __str_mode and IFS == "":
+        __split_fields = __split_fields_strmode_null
+    else:
+        __split_fields = __split_fields_null
+
     __buffer_mode = __check_option("-b")
     __modules = __get_header()
     for eq in __get_values():
         token = eq.split("=")
         locals()[token[0]] = token[1] if __str_mode else num(token[1])
 
-    IFS, IFSREGEX = __get_ifs()
     OFS = __get_ofs()
     FILES = sys.argv[2:] if len(sys.argv) > 2 else ["-"]
 
