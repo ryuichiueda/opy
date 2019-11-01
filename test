@@ -386,3 +386,13 @@ com=./opy
   result=$( a=3.14; b="aho aho" ; $com -s -v "x=$a" -v "y=$b" 'B:[x*2, y*2]' )
   [ "$result" = "3.143.14 aho ahoaho aho" ] 
 }
+
+@test "null separator" {
+  result=$( echo 123 | $com -i "" '[F2*2]' )
+  [ "$result" = "4" ] 
+}
+
+@test "null separator on string mode" {
+  result=$( echo 123 | $com -s -i "" '[F2*2]' )
+  [ "$result" = "22" ] 
+}
