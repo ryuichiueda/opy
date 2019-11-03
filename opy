@@ -5,7 +5,7 @@ import re
 import codecs
 from collections import defaultdict
 
-__version__ = "2.2.0"
+__version__ = "2.2.1"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
@@ -247,9 +247,23 @@ the option and its associated arguments.
 '''
 
 def __check_option(opt):
-    if opt in sys.argv:
-        sys.argv.remove(opt)
+    '''
+    This if sentence searches and removes
+    a simple argument like "-s". 
+    '''
+    if "-" + opt in sys.argv:
+        sys.argv.remove("-" + opt)
         return True
+
+    '''
+    This for sentence searches and removes 
+    an option character from 
+    combined arguments like "-sc". 
+    '''
+    for n, arg in enumerate(sys.argv):
+        if len(arg) > 0 and arg[0] == "-" and opt in arg:
+            sys.argv[n] = arg.replace(opt, "")
+            return True
      
     return False
 
@@ -373,18 +387,19 @@ if __name__ == "__main__":
         usage()
         sys.exit(1)
 
-    IFS, IFSREGEX = __get_ifs()
-    OFS = __get_ofs()
-
     '''
-    The following lines extract information from options.
+    The following part extracts information from options.
     Some names of variables have prefix "__" so as not to
     collide with the names that users define. 
     The names with upper case latters are predefined variables
     for users. 
     '''
-    __str_mode = __check_option("-s")
-    __csv_mode = __check_option("-c")
+    __str_mode = __check_option("s")
+    __csv_mode = __check_option("c")
+    __buffer_mode = __check_option("b")
+
+    IFS, IFSREGEX = __get_ifs()
+    OFS = __get_ofs()
 
     if __csv_mode:
         import csv
@@ -401,7 +416,6 @@ if __name__ == "__main__":
     else:
         __split_fields = __split_fields_null
 
-    __buffer_mode = __check_option("-b")
     __modules = __get_header()
 
     for eq in __get_values():

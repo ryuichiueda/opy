@@ -393,7 +393,7 @@ com=./opy
 }
 
 @test "null separator on string mode" {
-  result=$( echo 123 | $com -s -i "" '[F2*2]' )
+  result=$( echo 123 | $com -si "" '[F2*2]' )
   [ "$result" = "22" ] 
 }
 
@@ -403,7 +403,7 @@ com=./opy
 }
 
 @test "csv mode string" {
-  result=$( echo -ne '1,2,3' | $com -c -s '[F1+F2+F3]')
+  result=$( echo -ne '1,2,3' | $com -cs '[F1+F2+F3]')
   [ "$result" = '123' ]
 }
 
