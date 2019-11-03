@@ -5,7 +5,7 @@ import re
 import codecs
 from collections import defaultdict
 
-__version__ = "2.1.3"
+__version__ = "2.2.0"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
@@ -201,6 +201,17 @@ def __split_fields_strmode_null(line):
     return [line] + [c for c in line.rstrip('\n') ]
 
 
+'''
+These two functions are used for csv mode.
+'''
+def __split_fields_csv_string(line):
+    return [line] + list(csv.reader([line]))[0]
+
+
+def __split_fields_csv(line):
+    return [line] + [ num(x) for x in list(csv.reader([line]))[0] ]
+
+
 def __dynamic_module_import(msg):
     '''
     This function tries to import a package with the name extracted
@@ -363,6 +374,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     IFS, IFSREGEX = __get_ifs()
+    OFS = __get_ofs()
 
     '''
     The following lines extract information from options.
@@ -372,7 +384,15 @@ if __name__ == "__main__":
     for users. 
     '''
     __str_mode = __check_option("-s")
-    if __str_mode and IFS != "":
+    __csv_mode = __check_option("-c")
+
+    if __csv_mode:
+        import csv
+        if __str_mode:
+            __split_fields = __split_fields_csv_string
+        else:
+            __split_fields = __split_fields_csv
+    elif __str_mode and IFS != "":
         __split_fields = __split_fields_strmode
     elif IFS != "":
         __split_fields = __split_fields_normal
@@ -383,12 +403,10 @@ if __name__ == "__main__":
 
     __buffer_mode = __check_option("-b")
     __modules = __get_header()
+
     for eq in __get_values():
         token = eq.split("=")
         locals()[token[0]] = token[1] if __str_mode else num(token[1])
-
-    OFS = __get_ofs()
-    FILES = sys.argv[2:] if len(sys.argv) > 2 else ["-"]
 
     '''
     The following line parses the code. If the code is composed
@@ -396,6 +414,7 @@ if __name__ == "__main__":
     from the file list. Otherwise, the procedure stops when data
     is not given from it.
     '''
+    FILES = sys.argv[2:] if len(sys.argv) > 2 else ["-"]
     __p = Parser(sys.argv[1])
     if __p.lines == []:
         FILES.remove("-")
