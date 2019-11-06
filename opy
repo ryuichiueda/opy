@@ -5,7 +5,7 @@ import re
 import codecs
 from collections import defaultdict
 
-__version__ = "2.2.1"
+__version__ = "2.2.2"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
@@ -225,7 +225,7 @@ def __dynamic_module_import(msg):
         sys.exit(1)
 
 
-def __print_list(rule, f, glo, loc):
+def __print_list_normal(rule, f, glo, loc):
     '''
     This function outputs the list with the delimiter given in OFS.
     At a name error, it calls __dynamic_module_import so as to import
@@ -236,7 +236,20 @@ def __print_list(rule, f, glo, loc):
         print(OFS.join([str(e) for e in lst]))
     except NameError as e:
         __dynamic_module_import(e)
-        __print_list(rule, f, glo, loc)
+        __print_list_normal(rule, f, glo, loc)
+
+
+def __print_list_csv(rule, f, glo, loc):
+    '''
+    This function outputs the list with the csv format.
+    '''
+    try:
+        lst = eval(rule.action, glo, loc) if rule.action else f[1:]
+        lst = [ '"' + str(s).replace('"','""') + '"' for s in lst ]
+        print(",".join(lst))
+    except NameError as e:
+        __dynamic_module_import(e)
+        __print_list_csv(rule, f, glo, loc)
 
 
 '''
@@ -396,6 +409,7 @@ if __name__ == "__main__":
     '''
     __str_mode = __check_option("s")
     __csv_mode = __check_option("c")
+    __csv_output_mode = __check_option("C")
     __buffer_mode = __check_option("b")
 
     IFS, IFSREGEX = __get_ifs()
@@ -415,6 +429,8 @@ if __name__ == "__main__":
         __split_fields = __split_fields_strmode_null
     else:
         __split_fields = __split_fields_null
+
+    __print_list = __print_list_csv if __csv_output_mode else __print_list_normal
 
     __modules = __get_header()
 
