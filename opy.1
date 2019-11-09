@@ -1,4 +1,4 @@
-.TH "OPY" 1 "2019-09-10" "Man Page" "Utility Commands"
+.TH "OPY" 1 "2019-11-9" "Man Page" "Utility Commands"
 
 .SH NAME
 opy \- onelinerers' Python
@@ -6,8 +6,7 @@ opy \- onelinerers' Python
 .SH SYNOPSIS
 .B opy
 [
-.BI \-m 
-.I modules
+.BI \-bcCs
 ]
 [
 .BI \-i
@@ -17,8 +16,16 @@ opy \- onelinerers' Python
 .I separators
 ]
 [
+.BI \-m 
+.I modules
+]
+[
 .BI \-o
 .I separators
+]
+[
+.BI \-v
+.I <variable>=<string>
 ]
 .I 'prog'
 [
@@ -35,9 +42,17 @@ and reacts based on the rules written in the
 
 .SH OPTIONS
 .TP
-.B \-m
-.I modules
-import modules 
+.B \-b
+buffer the standard output
+.TP
+.B \-c
+read data as CSVs
+.TP
+.B \-C
+output data with a CSV format
+.TP
+.B \-s
+treat numbers from input data as strings
 .TP
 .B \-i
 .I separators
@@ -47,9 +62,17 @@ change input field separators
 .I separators
 change input field separators with a regular expression
 .TP
+.B \-m
+.I modules
+import modules 
+.TP
 .B \-o
 .I separators
 change output field separators
+.TP
+.B \-v
+.I <variable>=<string>
+define a variable from a string on the shell
 
 .SH SEE ALSO
 .BR python3 (1)
