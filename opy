@@ -5,7 +5,7 @@ import re
 import codecs
 from collections import defaultdict
 
-__version__ = "2.2.5"
+__version__ = "2.2.7"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
@@ -162,27 +162,26 @@ class Parser:
             return False
 
 
-class FieldSplitter:
-    '''
-    This class is a collection of functions for field splitting. 
-    '''
-    def select(self, str_mode, csv_mode):
-        if str_mode:
-            f = lambda lst: lst
-        else:
-            f = lambda lst: [ num(e) for e in lst ]
+'''
+This function returns functions based on options about field splitting.
+'''
+def __set_fields_split_function(str_mode, csv_mode):
+    if str_mode:
+        stringify = lambda lst: lst
+    else:
+        stringify = lambda lst: [ num(e) for e in lst ]
 
-        if IFSREGEX:
-            s = lambda ifs, line: re.split(ifs, line.rstrip('\n'))
-        else:
-            s = lambda ifs, line: line.rstrip('\n').split(ifs)
+    if IFSREGEX:
+        split = lambda ifs, line: re.split(ifs, line.rstrip('\n'))
+    else:
+        split = lambda ifs, line: line.rstrip('\n').split(ifs)
 
-        if csv_mode:
-            return lambda line: [line] + f(list(csv.reader([line]))[0])
-        elif IFS == "":
-            return lambda line: [line] + f(list(line.strip('\n')))
-        else:
-            return lambda line: [line] + f(s(IFS, line))
+    if csv_mode:
+        return lambda line: [line] + stringify(list(csv.reader([line]))[0])
+    elif IFS == "":
+        return lambda line: [line] + stringify(list(line.strip('\n')))
+    else:
+        return lambda line: [line] + stringify(split(IFS, line))
 
 
 def __dynamic_module_import(msg):
@@ -392,7 +391,7 @@ if __name__ == "__main__":
     OFS = __get_ofs()
 
 
-    __split_fields = FieldSplitter().select(__str_mode, __csv_mode)
+    __split_fields = __set_fields_split_function(__str_mode, __csv_mode)
     __print_list = __print_list_csv if __csv_output_mode else __print_list_normal
     __modules = __get_header()
 
