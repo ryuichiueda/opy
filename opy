@@ -5,7 +5,7 @@ import re
 import codecs
 from collections import defaultdict
 
-__version__ = "2.2.8"
+__version__ = "2.2.9"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
@@ -167,18 +167,18 @@ This function returns functions based on options about field splitting.
 '''
 def __set_fields_split_function(str_mode, csv_mode):
     if str_mode:
-        stringify = lambda lst: lst
+        cast = lambda lst: lst
     else:
-        stringify = lambda lst: [ num(e) for e in lst ]
+        cast = lambda lst: [ num(e) for e in lst ]
 
     if csv_mode:
-        return lambda line: [line] + stringify(list(csv.reader([line]))[0])
+        return lambda line: [line] + cast(list(csv.reader([line]))[0])
     elif IFS == "":
-        return lambda line: [line] + stringify(list(line))
+        return lambda line: [line] + cast(list(line))
     elif IFSREGEX:
-        return lambda line: [line] + stringify(re.split(IFS, line))
+        return lambda line: [line] + cast(re.split(IFS, line))
     else:
-        return lambda line: [line] + stringify(line.split(IFS))
+        return lambda line: [line] + cast(line.split(IFS))
 
 
 
