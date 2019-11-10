@@ -5,7 +5,7 @@ import re
 import codecs
 from collections import defaultdict
 
-__version__ = "2.2.7"
+__version__ = "2.2.8"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
@@ -171,17 +171,15 @@ def __set_fields_split_function(str_mode, csv_mode):
     else:
         stringify = lambda lst: [ num(e) for e in lst ]
 
-    if IFSREGEX:
-        split = lambda ifs, line: re.split(ifs, line.rstrip('\n'))
-    else:
-        split = lambda ifs, line: line.rstrip('\n').split(ifs)
-
     if csv_mode:
         return lambda line: [line] + stringify(list(csv.reader([line]))[0])
     elif IFS == "":
-        return lambda line: [line] + stringify(list(line.strip('\n')))
+        return lambda line: [line] + stringify(list(line))
+    elif IFSREGEX:
+        return lambda line: [line] + stringify(re.split(IFS, line))
     else:
-        return lambda line: [line] + stringify(split(IFS, line))
+        return lambda line: [line] + stringify(line.split(IFS))
+
 
 
 def __dynamic_module_import(msg):
