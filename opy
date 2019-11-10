@@ -5,7 +5,7 @@ import re
 import codecs
 from collections import defaultdict
 
-__version__ = "2.2.2"
+__version__ = "2.2.3"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
@@ -162,54 +162,60 @@ class Parser:
             return False
 
 
-def __split_fields_normal(line):
+class FieldSplitter:
     '''
-    This function splits a line into a list by using the characters
-    in IFS (input field separator), and return the list. This function
-    tries to convert each element into an int or float value. At the 
-    return of the list, the line before split is added to the list as
-    the zeroth element.
+    This class is a collection of functions for field splitting. 
     '''
-    line = line.rstrip('\n')
-    fs = re.split(IFS, line) if IFSREGEX else line.split(IFS)
-    return [line] + [num(e) for e in fs]
+    def select(self, str_mode, csv_mode):
+        if csv_mode:
+            return self.csv_s if str_mode else self.csv
+        elif IFS == "":
+            return self.null_ifs_s if str_mode else self.null_ifs
+        else:
+            return self.normal_s if str_mode else self.normal
+
+    def normal(self, line):
+        '''
+        This function splits a line into a list by using the characters
+        in IFS (input field separator), and return the list. This function
+        tries to convert each element into an int or float value. At the 
+        return of the list, the line before split is added to the list as
+        the zeroth element.
+        '''
+        line = line.rstrip('\n')
+        fs = re.split(IFS, line) if IFSREGEX else line.split(IFS)
+        return [line] + [num(e) for e in fs]
 
 
-def __split_fields_strmode(line):
+    def normal_s(self, line):
+        '''
+        This function is chosen by the main procedure when -s is given.
+        '''
+        line = line.rstrip('\n')
+        fs = re.split(IFS, line) if IFSREGEX else line.split(IFS)
+        return [line] + fs
+
+
     '''
-    This function splits a line into a list by using the characters
-    in IFS (input field separator), and return the list. At the 
-    return of the list, the line before split is added to the list 
-    as the zeroth element.
+    These two functions split a line to a set of characters.
     '''
-    line = line.rstrip('\n')
-    fs = re.split(IFS, line) if IFSREGEX else line.split(IFS)
-    return [line] + fs
+    def null_ifs(self, line):
+        return [line] + [num(e) for e in line.rstrip('\n') ] 
 
 
-def __split_fields_null(line):
+    def null_ifs_s(self, line):
+        return [line] + [c for c in line.rstrip('\n') ]
+
+
     '''
-    __split_fields when the IFS is a null string.
+    These two functions are used for csv mode.
     '''
-    return [line] + [num(e) for e in line.rstrip('\n') ] 
-
-
-def __split_fields_strmode_null(line):
-    '''
-    __split_fields when the IFS is a null string.
-    '''
-    return [line] + [c for c in line.rstrip('\n') ]
-
-
-'''
-These two functions are used for csv mode.
-'''
-def __split_fields_csv_string(line):
-    return [line] + list(csv.reader([line]))[0]
-
-
-def __split_fields_csv(line):
-    return [line] + [ num(x) for x in list(csv.reader([line]))[0] ]
+    def csv_s(self, line):
+        return [line] + list(csv.reader([line]))[0]
+    
+    
+    def csv(self, line):
+        return [line] + [ num(x) for x in list(csv.reader([line]))[0] ]
 
 
 def __dynamic_module_import(msg):
@@ -409,31 +415,23 @@ if __name__ == "__main__":
     '''
     __str_mode = __check_option("s")
     __csv_mode = __check_option("c")
+    if __csv_mode:
+        import csv
+
     __csv_output_mode = __check_option("C")
     __buffer_mode = __check_option("b")
 
     IFS, IFSREGEX = __get_ifs()
     OFS = __get_ofs()
 
-    if __csv_mode:
-        import csv
-        if __str_mode:
-            __split_fields = __split_fields_csv_string
-        else:
-            __split_fields = __split_fields_csv
-    elif __str_mode and IFS != "":
-        __split_fields = __split_fields_strmode
-    elif IFS != "":
-        __split_fields = __split_fields_normal
-    elif __str_mode and IFS == "":
-        __split_fields = __split_fields_strmode_null
-    else:
-        __split_fields = __split_fields_null
 
+    __split_fields = FieldSplitter().select(__str_mode, __csv_mode)
     __print_list = __print_list_csv if __csv_output_mode else __print_list_normal
-
     __modules = __get_header()
 
+    '''
+    This for loop sets variables given by -v options. 
+    '''
     for eq in __get_values():
         token = eq.split("=")
         locals()[token[0]] = token[1] if __str_mode else num(token[1])
