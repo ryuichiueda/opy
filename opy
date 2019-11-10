@@ -5,7 +5,7 @@ import re
 import codecs
 from collections import defaultdict
 
-__version__ = "2.2.3"
+__version__ = "2.2.4"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
@@ -167,12 +167,17 @@ class FieldSplitter:
     This class is a collection of functions for field splitting. 
     '''
     def select(self, str_mode, csv_mode):
-        if csv_mode:
-            return self.csv_s if str_mode else self.csv
-        elif IFS == "":
-            return self.null_ifs_s if str_mode else self.null_ifs
+        if str_mode:
+            self.__fs = lambda lst: lst
         else:
-            return self.normal_s if str_mode else self.normal
+            self.__fs = lambda lst: [ num(e) for e in lst ]
+
+        if csv_mode:
+            return lambda line:  [line] + self.__fs(list(csv.reader([line]))[0])
+        elif IFS == "":
+            return lambda line: [line] + self.__fs(list(line.strip('\n')))
+        else:
+            return self.normal
 
     def normal(self, line):
         '''
@@ -184,38 +189,7 @@ class FieldSplitter:
         '''
         line = line.rstrip('\n')
         fs = re.split(IFS, line) if IFSREGEX else line.split(IFS)
-        return [line] + [num(e) for e in fs]
-
-
-    def normal_s(self, line):
-        '''
-        This function is chosen by the main procedure when -s is given.
-        '''
-        line = line.rstrip('\n')
-        fs = re.split(IFS, line) if IFSREGEX else line.split(IFS)
-        return [line] + fs
-
-
-    '''
-    These two functions split a line to a set of characters.
-    '''
-    def null_ifs(self, line):
-        return [line] + [num(e) for e in line.rstrip('\n') ] 
-
-
-    def null_ifs_s(self, line):
-        return [line] + [c for c in line.rstrip('\n') ]
-
-
-    '''
-    These two functions are used for csv mode.
-    '''
-    def csv_s(self, line):
-        return [line] + list(csv.reader([line]))[0]
-    
-    
-    def csv(self, line):
-        return [line] + [ num(x) for x in list(csv.reader([line]))[0] ]
+        return [line] + self.__fs(fs)
 
 
 def __dynamic_module_import(msg):
