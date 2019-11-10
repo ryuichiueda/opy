@@ -173,16 +173,16 @@ class FieldSplitter:
             f = lambda lst: [ num(e) for e in lst ]
 
         if IFSREGEX:
-            s = re.split
+            s = lambda ifs, line: re.split(ifs, line.rstrip('\n'))
         else:
-            s = lambda ifs, line: line.split(ifs)
+            s = lambda ifs, line: line.rstrip('\n').split(ifs)
 
         if csv_mode:
             return lambda line: [line] + f(list(csv.reader([line]))[0])
         elif IFS == "":
             return lambda line: [line] + f(list(line.strip('\n')))
         else:
-            return lambda line: [line] + f(s(IFS, line.rstrip('\n')))
+            return lambda line: [line] + f(s(IFS, line))
 
 
 def __dynamic_module_import(msg):
