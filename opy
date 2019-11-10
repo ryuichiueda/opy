@@ -5,7 +5,7 @@ import re
 import codecs
 from collections import defaultdict
 
-__version__ = "2.2.4"
+__version__ = "2.2.5"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
@@ -168,28 +168,21 @@ class FieldSplitter:
     '''
     def select(self, str_mode, csv_mode):
         if str_mode:
-            self.__fs = lambda lst: lst
+            f = lambda lst: lst
         else:
-            self.__fs = lambda lst: [ num(e) for e in lst ]
+            f = lambda lst: [ num(e) for e in lst ]
+
+        if IFSREGEX:
+            s = re.split
+        else:
+            s = lambda ifs, line: line.split(ifs)
 
         if csv_mode:
-            return lambda line:  [line] + self.__fs(list(csv.reader([line]))[0])
+            return lambda line: [line] + f(list(csv.reader([line]))[0])
         elif IFS == "":
-            return lambda line: [line] + self.__fs(list(line.strip('\n')))
+            return lambda line: [line] + f(list(line.strip('\n')))
         else:
-            return self.normal
-
-    def normal(self, line):
-        '''
-        This function splits a line into a list by using the characters
-        in IFS (input field separator), and return the list. This function
-        tries to convert each element into an int or float value. At the 
-        return of the list, the line before split is added to the list as
-        the zeroth element.
-        '''
-        line = line.rstrip('\n')
-        fs = re.split(IFS, line) if IFSREGEX else line.split(IFS)
-        return [line] + self.__fs(fs)
+            return lambda line: [line] + f(s(IFS, line.rstrip('\n')))
 
 
 def __dynamic_module_import(msg):
