@@ -34,22 +34,17 @@ $ brew install oneliner-python
 
 ## options
 
+See [EXAMPLES.md](./EXAMPLES.md)
+
+* `-b`: buffer the standard output
+* `-c`: read data as CSVs
+* `-C`: output data with a CSV format
+* `-s`: treat numbers from input data as strings
+* `-i`: separators change input field separators
+* `-I`: separators change input field separators with a regular expression
+* `-m`: modules import modules
+* `-o`: separators change output field separators
+* `-v`: `<variable>=<string>` define a variable from a string on the shell
 * `--help`: show help
-* `-m <modules>`: load modules
-* `-s`: string mode
-    * prohibit automatic number conversions.
-* `-i, -o`: input/output field separator
 
-```
-$ echo '1,2,3,4,5' | opy -i , '[F2]'
-2
-$ echo '1,2,3,4,5' | opy -i , -o x '[F2,F3,F4]'
-2x3x4
-```
 
-* `-I`: regex input field separator
-
-```
-$ echo a33b313c | tr ' ' , | opy -I '\d+' '[*F[1:]]'
-a b c
-```
