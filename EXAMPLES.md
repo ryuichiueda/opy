@@ -174,28 +174,6 @@ $ seq 10 | opy 'NR%2:{L.append(F1)};E:[L]'
 [1, 3, 5, 7, 9]
 ```
 
-## options
-
-* `--help`: show help
-* `-m <modules>`: load modules
-* `-s`: string mode
-    * prohibit automatic number conversions.
-* `-i, -o`: input/output field separator
-
-```
-$ echo '1,2,3,4,5' | opy -i , '[F2]'
-2
-$ echo '1,2,3,4,5' | opy -i , -o x '[Fs(2,4)]'
-2x3x4
-```
-
-* `-I`: regex input field separator
-
-```
-$ echo a33b313c | tr ' ' , | opy -I '\d+' '[Fs(1,3)]'
-a b c
-```
-
 ## use of scipy
 
 * integrate
@@ -204,3 +182,72 @@ a b c
 opy 'B:{from scipy import integrate};B:{def f(x): return 2*x};B:[integrate.quad(f,0,5)]'
 (25.0, 2.7755575615628914e-13)
 ```
+
+## options
+
+
+* `-c`: read data as CSVs
+
+```
+$ echo 'a,"b,","c"""' | opy -c '[F1,F2,F3]'
+a b, c"
+```
+
+* `-C`: output data with a CSV format
+
+```
+$ echo '1 2 3' | opy -C True
+"1","2","3"
+$ echo '1 "2,3" 3 "' | opy -C True
+"1","""2,3""","3",""""
+```
+
+* `-s`: treat numbers from input data as strings
+
+
+
+* `-i`: separators change input field separators
+
+```
+$ echo 100 JPY | opy '[F1+F2]'
+(error!!)
+$ echo 100 JPY | opy -s '[F1+F2]'
+100JPY
+```
+
+* `-I`: separators change input field separators with a regular expression
+
+
+```
+$ echo a,b@c | opy -I '[,@]' '[F1,F2,F3]'
+a b c
+```
+
+* `-m`: modules import modules
+
+```
+$ opy -m numpy 'E:{print(numpy.pi)}'
+3.141592653589793
+$ opy -m math,numpy 'B:[math.e,numpy.e]'
+2.718281828459045 2.718281828459045
+```
+
+
+* `-o`: separators change output field separators
+
+
+```
+$ echo a,b@c | opy -I '[,@]' -o '=' '[F1,F2,F3]'
+a=b=c
+```
+
+* `-v`: `<variable>=<string>` define a variable from a string on the shell
+
+
+
+```
+$ a=abc
+$ opy -v "b=$a" 'B:[b*2]'
+abcabc
+```
+
