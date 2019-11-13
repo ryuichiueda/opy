@@ -5,7 +5,7 @@ import re
 import codecs
 from collections import defaultdict
 
-__version__ = "2.2.9"
+__version__ = "2.2.10"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
@@ -331,22 +331,6 @@ def num(s):
         return float(s)
     except ValueError:
         return s
-
-
-def join(fs, pos=None):
-    if pos == None:
-        return OFS.join( [str(f) for f in fs] )
-
-    outindex = [pos] if isinstance(pos, int) else pos
-    outlist = fs if isinstance(fs, list) else __split_fields(fs)
-    return OFS.join( [str(outlist[p]) for p in outindex ] )
-
-
-def dropjoin(fs, pos):
-    pos = [pos] if isinstance(pos, int) else pos
-    outindex = list( set(range(1, NF+1)).difference(pos) )
-    outlist = fs if isinstance(fs, list) else __split_fields(fs)
-    return OFS.join( [ str(outlist[e]) for e in outindex ] )
 
 
 def p_(var, end=None):
