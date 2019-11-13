@@ -128,20 +128,6 @@ $ seq 10 | opy 'r_("[24680]", F1)'
 10
 ```
 
-* field selection
-
-```
-$ echo {1..10} | opy '[join(F,[2,3,4,6,7,8])]'
-2 3 4 6 7 8
-```
-
-* field drop
-
-```
-$ echo {1..10} | opy '[dropjoin(F0,[2,3,5])]'
-1 4 6 7 8 9 10
-```
-
 ### input from file
 
 ```
