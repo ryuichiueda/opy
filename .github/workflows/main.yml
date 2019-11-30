@@ -13,5 +13,5 @@ jobs:
       run: echo Hello, world!
     - name: Run a multi-line script
       run: |
-        apt-get install bats
+        sudo apt-get install bats
         ./test
