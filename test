@@ -185,6 +185,11 @@ com=./opy
   [ "$result" = "['a', 'aa', 'aaa']" ] 
 }
 
+@test "general purpose key values" {
+  result=$( echo -e 'a 2\nb b\na c\nb 10.0' | $com '{K[F1].append(F2)};E:{p_(K)}' | xargs )
+  [ "$result" = "a [2, c] b [b, 10.0]" ] 
+}
+
 @test "print dictionary by p_" {
   result=$( seq 3 | $com '{D[NR]="a"*F1};E:{p_(D,"@")}' )
   [ "$result" = "1 a@2 aa@3 aaa@" ] 

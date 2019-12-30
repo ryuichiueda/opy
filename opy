@@ -5,7 +5,7 @@ import re
 import codecs
 from collections import defaultdict
 
-__version__ = "2.2.10"
+__version__ = "2.3.0"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
@@ -401,6 +401,7 @@ if __name__ == "__main__":
     FNR = 0
     D = defaultdict(int)   #general purpose distionary
     L = []                 #general purpose list
+    K = defaultdict(list)  #general purpose key & list
 
     # The modules after -m option are imported here. 
     if __modules != "":
