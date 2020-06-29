@@ -25,6 +25,16 @@ The `opy` file and its manual are copied to `/usr/local/bin/` and `/usr/local/sh
 $ sudo make install
 ```
 
+
+You can also install it with 
+
+```
+$ chmod +x opy
+$ cp opy /usr/local/bin/
+```
+
+since `opy` is an independent script file.
+
 ### homebrew
 
 ```
