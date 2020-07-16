@@ -5,7 +5,7 @@ import re
 import codecs
 from collections import defaultdict
 
-__version__ = "2.3.0"
+__version__ = "2.3.1"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
@@ -468,4 +468,5 @@ if __name__ == "__main__":
 
     # Opy ignores PIPEFAIL. 
     except BrokenPipeError:
-        sys.exit(0)
+        import os
+        os._exit(0)
