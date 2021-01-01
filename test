@@ -247,3 +247,8 @@ com=./opy
   [ "$result" = "$result2" ]
 }
 
+@test "json" {
+  result=$( echo '{"hoge":["a","b"]}' | $com -j '[e for e in D["hoge"]]' | tr '\n' @)
+  [ "$result" = "a@b@" ]
+}
+

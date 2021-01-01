@@ -5,7 +5,7 @@ import re
 import codecs
 from collections import defaultdict
 
-__version__ = "2.3.1"
+__version__ = "2.4.0"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
@@ -231,7 +231,7 @@ the option and its associated arguments.
 
 def __check_option(opt):
     '''
-    This if sentence searches and removes
+    This if-sentence searches and removes
     a simple argument like "-s". 
     '''
     if "-" + opt in sys.argv:
@@ -300,6 +300,8 @@ def __get_ofs():
         ofs = sys.argv[pos+1]
         sys.argv.remove("-o")
         sys.argv.remove(ofs)
+        if ofs == "\\n": ofs = "\n"
+        if ofs == "\\t": ofs = "\t"
 
     return ofs
 
@@ -361,6 +363,7 @@ if __name__ == "__main__":
     The names with upper case latters are predefined variables
     for users. 
     '''
+    __json_mode = __check_option("j")
     __str_mode = __check_option("s")
     __csv_mode = __check_option("c")
     if __csv_mode:
@@ -425,6 +428,22 @@ if __name__ == "__main__":
         for FILENAME in FILES:
             __h_file = sys.stdin if FILENAME == "-" else open(FILENAME, "r")
             FNR = 0 # raw number in each file
+
+            if __json_mode:
+                OFS = "\n"
+                import json
+                D = json.load(__h_file)
+                for __r in __p.lines:
+                    if __r.has_normal_action:
+                       exec(__r.action)
+                    else:
+                        __print_list(__r, F, globals(), locals())
+    
+                    if not __buffer_mode:
+                        sys.stdout.flush()
+
+                __h_file.close()
+                continue
     
             for F0 in __h_file:
                 F0 = F0.rstrip()
