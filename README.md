@@ -57,6 +57,7 @@ See [EXAMPLES.md](./EXAMPLES.md)
 * `-m`: modules import modules
 * `-o`: separators change output field separators
 * `-v`: `<variable>=<string>` define a variable from a string on the shell
+* `-j`: json mode (A json tree is stored in the dictonary `D`.)
 * `--help`: show help
 
 
