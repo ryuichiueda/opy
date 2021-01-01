@@ -5,7 +5,7 @@ import re
 import codecs
 from collections import defaultdict
 
-__version__ = "2.4.0"
+__version__ = "2.4.1"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
@@ -364,6 +364,7 @@ if __name__ == "__main__":
     for users. 
     '''
     __json_mode = __check_option("j")
+    __yaml_mode = __check_option("y")
     __str_mode = __check_option("s")
     __csv_mode = __check_option("c")
     if __csv_mode:
@@ -428,6 +429,22 @@ if __name__ == "__main__":
         for FILENAME in FILES:
             __h_file = sys.stdin if FILENAME == "-" else open(FILENAME, "r")
             FNR = 0 # raw number in each file
+
+            if __yaml_mode:
+                OFS = "\n"
+                import yaml
+                D = yaml.load(__h_file, Loader=yaml.SafeLoader)
+                for __r in __p.lines:
+                    if __r.has_normal_action:
+                       exec(__r.action)
+                    else:
+                        __print_list(__r, F, globals(), locals())
+    
+                    if not __buffer_mode:
+                        sys.stdout.flush()
+
+                __h_file.close()
+                continue
 
             if __json_mode:
                 OFS = "\n"

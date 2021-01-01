@@ -229,7 +229,15 @@ abcabc
 * `-j`: read a json data and bind to a dictionary `D`
 
 ```
-$ echo '{"hoge":["a","b"]}' | opy -j '[e for e in D["hoge"]]'
+$ echo '{"hoge":["a","b"]}' | opy -j '[*D["hoge"]]'
+a
+b
+```
+
+* `-j`: read a yaml data and bind to a dictionary `D`
+
+```
+$ echo -e 'aho:\n  boke: ["a","b"]' | opy -y '[*D["aho"]["boke"]]'
 a
 b
 ```

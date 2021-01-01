@@ -251,4 +251,10 @@ com=./opy
   result=$( echo '{"hoge":["a","b"]}' | $com -j '[e for e in D["hoge"]]' | tr '\n' @)
   [ "$result" = "a@b@" ]
 }
+ 
+
+@test "yaml" {
+  result=$( echo -e 'aho:\n  boke: ["a","b"]' | $com -y '[*D["aho"]["boke"]]' | tr '\n' @)
+  [ "$result" = "a@b@" ]
+}
 
