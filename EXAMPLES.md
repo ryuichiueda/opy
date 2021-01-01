@@ -220,11 +220,17 @@ a=b=c
 
 * `-v`: `<variable>=<string>` define a variable from a string on the shell
 
-
-
 ```
 $ a=abc
 $ opy -v "b=$a" 'B:[b*2]'
 abcabc
+```
+
+* `-j`: read a json data and bind to a dictionary `D`
+
+```
+$ echo '{"hoge":["a","b"]}' | opy -j '[e for e in D["hoge"]]'
+a
+b
 ```
 
