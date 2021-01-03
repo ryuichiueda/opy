@@ -52,13 +52,12 @@ See [EXAMPLES.md](./EXAMPLES.md)
 * `-c`: read data as CSVs
 * `-C`: output data with a CSV format
 * `-s`: treat numbers from input data as strings
-* `-i`: separators change input field separators
-* `-I`: separators change input field separators with a regular expression
-* `-m`: modules import modules
-* `-o`: separators change output field separators
-* `-v`: `<variable>=<string>` define a variable from a string on the shell
-* `-j`: json mode (A json tree is stored in the dictonary `D`.)
-* `-y`: yaml mode (A json tree is stored in the dictonary `D`.)
+* `-i <separator>`: separators change input field separators
+* `-I <separator>`: separators change input field separators with a regular expression
+* `-m <module>`: modules import modules
+* `-o <separator>`: separators change output field separators
+* `-v <variable>=<string>`: define a variable from a string on the shell
+* `-t <json/yaml/xml>`: tree mode (A json/yaml/xml file is loaded to an object "T".)
 * `--help`: show help
 
 
