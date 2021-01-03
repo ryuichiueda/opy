@@ -229,10 +229,10 @@ abcabc
 * `-t <json/yaml/xml>`: read a json/yaml/xml file and set the data to an object "T".
 
 ```
-$ echo '{"hoge":["a","b"]}' | opy -t json '[*D["hoge"]]'
+$ echo '{"hoge":["a","b"]}' | opy -t json '[*T["hoge"]]'
 a
 b
-$ echo -e 'aho:\n  boke: ["a","b"]' | opy -t yaml '[*D["aho"]["boke"]]'
+$ echo -e 'aho:\n  boke: ["a","b"]' | opy -t yaml '[*T["aho"]["boke"]]'
 a
 b
 $ echo -e '<?xml version="1.0" encoding="utf-8"?>\n<foo>bar</foo>' | opy -t xml '[e.text for e in T.iter("foo")]'
