@@ -5,7 +5,7 @@ import re
 import codecs
 from collections import defaultdict
 
-__version__ = "2.4.1"
+__version__ = "2.5.0"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
@@ -181,6 +181,20 @@ def __set_fields_split_function(str_mode, csv_mode):
         return lambda line: [line] + cast(line.split(IFS))
 
 
+def __set_tree(tree_type):
+    if tree_type == "yaml":
+        import yaml
+        return yaml.load(__h_file, Loader=yaml.SafeLoader)
+    elif tree_type == "json":
+        import json
+        return json.load(__h_file)
+    elif tree_type == "xml":
+        import xml.etree.ElementTree as ET
+        return ET.parse(__h_file).getroot()
+    else:
+        exec("import " + tree_type)
+        return eval(__tree_mode).load(__h_file)
+
 
 def __dynamic_module_import(msg):
     '''
@@ -306,6 +320,17 @@ def __get_ofs():
     return ofs
 
 
+def __get_tree_mode():
+    ofs = " "
+    if "-t" in sys.argv:
+        pos = sys.argv.index("-t")
+        ofs = sys.argv[pos+1]
+        sys.argv.remove("-t")
+        sys.argv.remove(ofs)
+
+    return ofs
+
+
 '''
 Following variables and functions before
 the main part are for users. 
@@ -363,6 +388,7 @@ if __name__ == "__main__":
     The names with upper case latters are predefined variables
     for users. 
     '''
+    __xml_mode = __check_option("x")
     __json_mode = __check_option("j")
     __yaml_mode = __check_option("y")
     __str_mode = __check_option("s")
@@ -375,6 +401,7 @@ if __name__ == "__main__":
 
     IFS, IFSREGEX = __get_ifs()
     OFS = __get_ofs()
+    __tree_mode = __get_tree_mode()
 
 
     __split_fields = __set_fields_split_function(__str_mode, __csv_mode)
@@ -430,38 +457,16 @@ if __name__ == "__main__":
             __h_file = sys.stdin if FILENAME == "-" else open(FILENAME, "r")
             FNR = 0 # raw number in each file
 
-            if __yaml_mode:
+            '''
+            When a json/yaml/xml file is handled, opy loads the tree to 
+            the reference "T". Since all contents are read at once, the 
+            rules written by users are treated as end rules. 
+            '''
+            if __tree_mode != " ":
                 OFS = "\n"
-                import yaml
-                D = yaml.load(__h_file, Loader=yaml.SafeLoader)
-                for __r in __p.lines:
-                    if __r.has_normal_action:
-                       exec(__r.action)
-                    else:
-                        __print_list(__r, F, globals(), locals())
-    
-                    if not __buffer_mode:
-                        sys.stdout.flush()
+                T = __set_tree(__tree_mode)
+                __p.ends = __p.lines
 
-                __h_file.close()
-                continue
-
-            if __json_mode:
-                OFS = "\n"
-                import json
-                D = json.load(__h_file)
-                for __r in __p.lines:
-                    if __r.has_normal_action:
-                       exec(__r.action)
-                    else:
-                        __print_list(__r, F, globals(), locals())
-    
-                    if not __buffer_mode:
-                        sys.stdout.flush()
-
-                __h_file.close()
-                continue
-    
             for F0 in __h_file:
                 F0 = F0.rstrip()
                 F = __split_fields(F0)
