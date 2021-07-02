@@ -5,7 +5,7 @@ import re
 import codecs
 from collections import defaultdict
 
-__version__ = "2.6.0"
+__version__ = "2.6.1"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
@@ -182,6 +182,8 @@ def __set_fields_split_function(str_mode, csv_mode):
 
 
 def __set_tree(tree_type):
+    global __h_file
+
     if tree_type == "yaml":
         import yaml
         return yaml.load(__h_file, Loader=yaml.SafeLoader)
@@ -194,6 +196,13 @@ def __set_tree(tree_type):
     elif tree_type == "csv":
         import csv
         return {i:e for i,e in enumerate(csv.reader(__h_file, lineterminator="\n"))}
+    elif tree_type == "xlsx":
+        #import openpyxl
+        __h_file.close()
+        __h_file = open("/dev/null")
+        #return openpyxl.load_workbook(FILENAME, data_only=True)
+        import pandas
+        return pandas.read_excel(FILENAME, engine="openpyxl", header=None, sheet_name=None)
     else:
         exec("import " + tree_type)
         return eval(__tree_mode).load(__h_file)
