@@ -225,17 +225,17 @@ com=./opy
   [ "$result" = "22" ] 
 }
 
-@test "csv mode" {
+@test "csv line mode" {
   result=$( echo -ne '1,2,3\n"あ","い"",","う"\n"やや,""こし"",や〜","やや,""こし"",や〜",","\n"もう,"",","いや,"",や"\n' | $com -c -o '|' 'NR' | tr '\n' @ )
   [ "$result" = '1|2|3@あ|い",|う@やや,"こし",や〜|やや,"こし",や〜|,@もう,",|いや,",や@' ] 
 }
 
-@test "csv mode string" {
+@test "csv line mode string" {
   result=$( echo -ne '1,2,3' | $com -cs '[F1+F2+F3]')
   [ "$result" = '123' ]
 }
 
-@test "csv mode num" {
+@test "csv line mode num" {
   result=$( echo -ne '1,2,3' | $com -c '[F1+F2+F3]')
   [ "$result" = '6' ]
 }
@@ -262,4 +262,10 @@ com=./opy
 @test "xml" {
   result=$( echo -e '<?xml version="1.0" encoding="utf-8"?>\n<hoge>aho</hoge>' | $com -t xml '[e.text for e in T.iter("hoge")]')
   [ "$result" = "aho" ]
+}
+
+
+@test "-t csv" {
+  result=$( echo -e 'z\na,b,"c\nd",e,f' | $com -t csv '[T[1][2]]')
+  [ "$result" = c$'\n'd ]
 }

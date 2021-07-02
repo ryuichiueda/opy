@@ -49,7 +49,7 @@ $ brew install oneliner-python
 See [EXAMPLES.md](./EXAMPLES.md)
 
 * `-b`: buffer the standard output
-* `-c`: read data as CSVs
+* `-c`: read each line as CSV data
 * `-C`: output data with a CSV format
 * `-s`: treat numbers from input data as strings
 * `-i <separator>`: separators change input field separators
@@ -57,7 +57,7 @@ See [EXAMPLES.md](./EXAMPLES.md)
 * `-m <module>`: modules import modules
 * `-o <separator>`: separators change output field separators
 * `-v <variable>=<string>`: define a variable from a string on the shell
-* `-t <json/yaml/xml>`: tree mode (A json/yaml/xml file is loaded to an object "T".)
+* `-t <json/yaml/xml/csv>`: tree mode (read a json/yaml/xml/csv file entirely and set the data to an object "T".)
 * `--help`: show help
 
 

@@ -5,7 +5,7 @@ import re
 import codecs
 from collections import defaultdict
 
-__version__ = "2.5.2"
+__version__ = "2.6.0"
 __author__ = "Ryuichi Ueda"
 __license__ = "MIT license"
 __url__ = "https://github.com/ryuichiueda/opy"
@@ -13,7 +13,7 @@ __url__ = "https://github.com/ryuichiueda/opy"
 
 def usage():
     print("opy " + __version__ + "\n", file=sys.stderr)
-    print("Copyright 2019 " + __author__, file=sys.stderr)
+    print("Copyright 2021 " + __author__, file=sys.stderr)
     print("Released under " + __license__, file=sys.stderr)
     print(__url__, file=sys.stderr)
     print("\nYou are using Python {}.{}.{} with this command."
@@ -191,6 +191,9 @@ def __set_tree(tree_type):
     elif tree_type == "xml":
         import xml.etree.ElementTree as ET
         return ET.parse(__h_file).getroot()
+    elif tree_type == "csv":
+        import csv
+        return {i:e for i,e in enumerate(csv.reader(__h_file, lineterminator="\n"))}
     else:
         exec("import " + tree_type)
         return eval(__tree_mode).load(__h_file)
@@ -388,12 +391,9 @@ if __name__ == "__main__":
     The names with upper case latters are predefined variables
     for users. 
     '''
-    __xml_mode = __check_option("x")
-    __json_mode = __check_option("j")
-    __yaml_mode = __check_option("y")
     __str_mode = __check_option("s")
-    __csv_mode = __check_option("c")
-    if __csv_mode:
+    __csv_line_mode = __check_option("c")
+    if __csv_line_mode:
         import csv
 
     __csv_output_mode = __check_option("C")
@@ -403,8 +403,7 @@ if __name__ == "__main__":
     OFS = __get_ofs()
     __tree_mode = __get_tree_mode()
 
-
-    __split_fields = __set_fields_split_function(__str_mode, __csv_mode)
+    __split_fields = __set_fields_split_function(__str_mode, __csv_line_mode)
     __print_list = __print_list_csv if __csv_output_mode else __print_list_normal
     __modules = __get_header()
 
