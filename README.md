@@ -39,6 +39,8 @@ $ sudo make install
 
 ### homebrew
 
+The version remains old because I don't have a Mac PC anymore...
+
 ```
 $ brew tap ryuichiueda/oneliner-python
 $ brew install oneliner-python
