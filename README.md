@@ -23,7 +23,7 @@ You can install `opy` with
 
 ```
 $ chmod +x opy
-$ cp opy /usr/local/bin/     # Please check PATH.
+$ sudo cp opy /usr/local/bin/     # Please check PATH.
 ```
 
 since `opy` is an independent script file.
