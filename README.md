@@ -2,8 +2,6 @@
 
  a Python wrapper that works like AWK or rb command
 
-[![Build Status](https://travis-ci.org/ryuichiueda/opy.svg?branch=master)](https://travis-ci.org/ryuichiueda/opy)
-
 ## example of use
 
 ```
