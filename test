@@ -269,3 +269,10 @@ com=./opy
   result=$( echo -e 'z\na,b,"c\nd",e,f' | $com -t csv '[T[1][2]]')
   [ "$result" = c$'\n'd ]
 }
+
+
+@test "-t xlsx" {
+  result=$( $com -t xlsx '{a = T["Sheet1"].values};[a[1][0]]' ./testdata/test.xlsx)
+  [ "$result" = "危険シェル芸" ]
+}
+

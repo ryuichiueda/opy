@@ -59,7 +59,7 @@ See [EXAMPLES.md](./EXAMPLES.md)
 * `-m <module>`: modules import modules
 * `-o <separator>`: separators change output field separators
 * `-v <variable>=<string>`: define a variable from a string on the shell
-* `-t <json/yaml/xml/csv>`: tree mode (read a json/yaml/xml/csv file entirely and set the data to an object "T".)
+* `-t <json/yaml/xml/csv/xslx>`: tree mode (read a json/yaml/xml/csv/xslx file entirely and set the data to an object "T".)
 * `--help`: show help
 
 
