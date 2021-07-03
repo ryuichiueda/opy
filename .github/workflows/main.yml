@@ -15,5 +15,5 @@ jobs:
     - name: Set up and test with Python ${{ matrix.python-version }}
       run: |
         sudo apt-get install python3-pip bats
-        pip3 install numpy pandas
+        pip3 install numpy pandas openpyxl
         ./test
